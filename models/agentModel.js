@@ -65,6 +65,9 @@ const agentSchema = new mongoose.Schema({
     nombrenfants: {
         type: Number,
       },
+      dateNotif: {
+        type: Date,
+      },
       photo: {
         type: String,
         // required: [true, "Renseignez la photo de l agent"],
