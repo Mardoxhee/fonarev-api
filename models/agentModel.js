@@ -72,7 +72,7 @@ const agentSchema = new mongoose.Schema({
         type: String,
         // required: [true, "Renseignez la photo de l agent"],
       },
-      direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
+      // direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
 })
 
 const Agents = mongoose.model("Book", agentSchema);
