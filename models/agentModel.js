@@ -31,6 +31,10 @@ const agentSchema = new mongoose.Schema({
         type: String,
         // required: [true, "renseignez votre état civile"],
       },
+      direction: {
+        type: String,
+        // required: [true, "Renseignez le nom"],
+      },
       phone: {
         type: String,
         unique: true,
