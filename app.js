@@ -16,7 +16,7 @@ const corsOptions = {
 
   app.get("/", function (req, res) {
     res.send(
-      "Welcome on Yuding platform APi ========== copy this link to read the documenation of this api ======================== https://docs.google.com/document/d/1qo06FtuJOP4jzVf2ewAspeEGRnIJEly3b4ZzpQ7tGxg/edit?usp=sharing"
+      "Welcom to fonarev API========== copy this link to read the documenation of this api ======================== https://docs.google.com/document/d/1qo06FtuJOP4jzVf2ewAspeEGRnIJEly3b4ZzpQ7tGxg/edit?usp=sharing"
     );
   });
 app.use("/agents", cors(corsOptions), AgentRouter);
