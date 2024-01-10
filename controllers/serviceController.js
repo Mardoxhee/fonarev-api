@@ -1,14 +1,14 @@
-const Direction = require("./../models/directionModel");
+const Service = require("./../models/serviceModel");
 const APIfeatures = require("./../utils/apiFeatures");
 
-exports.createDirection = async (req, res) => {
+exports.createService = async (req, res) => {
   try {
     const bodies = req.body;
     bodies.account = req.decoded.id;
-    const newDirection = await Direction.create(bodies);
+    const newService = await Service.create(bodies);
     res.status(201).json({
-      status: "direction created successfully",
-      newDirection,
+      status: "service created successfully",
+      newService,
     });
   } catch (err) {
     res.status(400).json({
@@ -19,18 +19,19 @@ exports.createDirection = async (req, res) => {
   }
 };
 
-exports.getAllDirections = async (req, res) => {
+exports.getAllServices = async (req, res) => {
   try {
-    const features = new APIfeatures(Direction.find(), req.query)
+    const features = new APIfeatures(Service.find(), req.query)
       .filter()
       .sort()
       .limitFields()
       .paginate();
-    const directions = await features.query;
+    const service = await features.query.populate('direction');
+
     res.status(200).json({
       status: "Success",
-      numberOfDirections: directions.length,
-      directions,
+      numberOfServices: service.length,
+      service,
     });
   } catch (err) {
     res.status(400).json({
@@ -40,35 +41,31 @@ exports.getAllDirections = async (req, res) => {
   }
 };
 
-exports.getOneDirection = async (req, res) => {
+exports.getOneService = async (req, res) => {
   try {
-    const direction = await Direction.findById(req.params.id)
-    .populate({
-      path: "services",
-      populate: {
-        path: "agents",
-      },
-    });
+    const service = await Service.findById(req.params.id)
+    .populate("agents");
     res.status(200).json({
-      status: "success",
-      direction,
-    });
+        status: "success",
+        service,
+      });
   } catch (err) {
     res.status(400).json({
       status: "failed",
       message: err.message,
     });
   }
+  
 };
-exports.updateDirection = async (req, res) => {
+exports.updateService = async (req, res) => {
   try {
-    const direction = await Direction.findByIdAndUpdate(req.params.id, req.body, {
+    const service = await Direction.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
     res.status(200).json({
       statusstatus: "success",
-      direction,
+      service,
     });
   } catch (err) {
     res.status(400).json({
@@ -78,11 +75,11 @@ exports.updateDirection = async (req, res) => {
   }
 };
 
-exports.deleteDirection = async (req, res) => {
+exports.deleteService = async (req, res) => {
   try {
     await Direction.findByIdAndDelete(req.params.id);
     res.status(200).json({
-      status: "Direction deleted successfully",
+      status: "Service deleted successfully",
       data: null,
     });
   } catch (err) {

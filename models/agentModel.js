@@ -31,10 +31,10 @@ const agentSchema = new mongoose.Schema({
         type: String,
         // required: [true, "renseignez votre état civile"],
       },
-      direction: {
-        type: String,
-        // required: [true, "Renseignez le nom"],
-      },
+      // direction: {
+      //   type: String,
+      //   // required: [true, "Renseignez le nom"],
+      // },
       phone: {
         type: String,
         unique: true,
@@ -68,7 +68,7 @@ const agentSchema = new mongoose.Schema({
     },
     nombrenfants: {
         type: Number,
-      },
+      }, 
       dateNotif: {
         type: Date,
       },
@@ -76,8 +76,8 @@ const agentSchema = new mongoose.Schema({
         type: String,
         // required: [true, "Renseignez la photo de l agent"],
       },
-      // direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
+      service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
 })
 
-const Agents = mongoose.model("Book", agentSchema);
+const Agents = mongoose.model("Agents", agentSchema);
 module.exports = Agents;

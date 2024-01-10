@@ -4,17 +4,18 @@ const { protect } = require("../controllers/authController");
 
 const {
     createDirection,
-    getDirections,
-    getOneDiretion,
+    getAllDirections,
+    getOneDirection,
     updateDirection,
     deleteDirection,
 
   } = require("../controllers/directionController");
 
-  router.route("/").get(protect, getDirections).post(protect, createDirection);
+  router.route("/").get(protect,     getAllDirections,
+    ).post(protect, createDirection);
   router
   .route("/:id")
-  .get(getOneDiretion)
+  .get(getOneDirection)
   .patch(updateDirection)
   .delete(deleteDirection);
 

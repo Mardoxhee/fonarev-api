@@ -11,7 +11,6 @@ exports.createAgent = async (req, res) => {
         message: "Le matricule existe déjà. Veuillez en choisir un autre.",
       });
     }
-
     const dernierAgent = await Agent.findOne({}, {}, { sort: { numero: -1 } });
     const numeroSuivant = dernierAgent ? dernierAgent.numero + 1 : 1;
     const newAgent = await Agent.create({ ...req.body, numero: numeroSuivant });
