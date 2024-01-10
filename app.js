@@ -3,6 +3,9 @@ const app = express();
 const bp = require('body-parser');
 const AccountRouter = require("./routes/accountRoutes");
 const AgentRouter = require("./routes/agentRoutes");
+const DirectionRouter = require("./routes/directionRoutes");
+const ServiceRouter = require("./routes/serviceRoutes");
+
 app.use(bp.json())
 var cors = require("cors");
 
@@ -21,5 +24,7 @@ const corsOptions = {
   });
 app.use("/agents", cors(corsOptions), AgentRouter);
 app.use("/accounts", cors(corsOptions), AccountRouter);
+app.use("/directions", cors(corsOptions), DirectionRouter);
+app.use("/services", cors(corsOptions), ServiceRouter);
 
 module.exports = app;

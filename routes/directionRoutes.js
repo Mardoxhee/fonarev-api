@@ -11,7 +11,7 @@ const {
 
   } = require("../controllers/directionController");
 
-  router.route("/").get(protect,     getAllDirections,
+  router.route("/").get(protect,getAllDirections,
     ).post(protect, createDirection);
   router
   .route("/:id")
