@@ -6,9 +6,13 @@ const crypto = require("crypto");
 const serviceSchema = new mongoose.Schema({
   denomination: {
     type: String,
-    required: [true, "an account must have a lastName"],
+    required: [true, "Un service doit avoir un nom"],
   },
-
+  descrption: {
+    type: String,
+    required: [true, "Rajoutez une brève desription pour ce service"],
+  },
+  responsable : { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
   direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
   agents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Agent" }],
 });
