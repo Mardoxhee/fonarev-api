@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 const agentSchema = new mongoose.Schema({
-    numero: {
-      type: Number,
-      unique: true, // Assurez-vous que le numéro est unique
-      min: 1,
-      max: 9999, // Limitez la plage de numéros de 1 à 9999
-    },
+    // numero: {
+    //   type: Number,
+    //   unique: true, // Assurez-vous que le numéro est unique
+    //   min: 1,
+    //   max: 9999, // Limitez la plage de numéros de 1 à 9999
+    // },
     nom: {
       type: String,
       required: [true, "Renseignez le nom"],
@@ -25,6 +25,9 @@ const agentSchema = new mongoose.Schema({
         required: [true, "Renseignez le genre"],
       },  
     province: {
+        type: String,
+      },
+      provinceOrigin: {
         type: String,
       },
     etatcivile: {
