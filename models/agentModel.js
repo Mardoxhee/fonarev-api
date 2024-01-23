@@ -10,7 +10,7 @@ const agentSchema = new mongoose.Schema({
     // },
     nom: {
       type: String,
-      required: [true, "Renseignez le nom"],
+      // required: [true, "Renseignez le nom"],
     },
     postnom: {
         type: String,
@@ -18,11 +18,11 @@ const agentSchema = new mongoose.Schema({
       },
     prenom: {
         type: String,
-        required: [true, "Renseignez le prenom"],
+        // required: [true, "Renseignez le prenom"],
       },
     genre: {
         type: String,
-        required: [true, "Renseignez le genre"],
+        // required: [true, "Renseignez le genre"],
       },  
     province: {
         type: String,
@@ -41,26 +41,26 @@ const agentSchema = new mongoose.Schema({
       phone: {
         type: String,
         unique: true,
-        required: [true, "An account has to have a phone number"],
+        // required: [true, "An account has to have a phone number"],
         validate: [validator.isMobilePhone, "please provide a good phone number"],
       },
       emailPerso: {
         type: String,
-        required: [true, "please provide a mail "],
+        // required: [true, "please provide a mail "],
         unique: true,
         lowercase: true,
         validate: [validator.isEmail, "please provide a valid mail"],
       },
       emailPro: {
         type: String,
-        required: [true, "please provide a mail "],
+        // required: [true, "please provide a mail "],
         unique: true,
         lowercase: true,
         validate: [validator.isEmail, "please provide a valid mail"],
       },
       matricule: {
         type: Number,
-        required: [true, "Renseignez le numéro matricule"],
+        // required: [true, "Renseignez le numéro matricule"],
         unique: [true, "deux agents ne peuvent pas avoir le même matricule"],
       },
       grade: {
