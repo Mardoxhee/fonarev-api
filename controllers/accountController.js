@@ -8,9 +8,7 @@ exports.getAllAccounts = async (req, res) => {
     res.status(200).json({
       status: "success",
       accountNumber: accounts.length,
-      data: {
         accounts,
-      },
     });
   } catch (err) {
     res.status(400).json({
@@ -25,9 +23,7 @@ exports.getAccount = async (req, res) => {
     const account = await Account.findById(req.params.id);
     res.status(200).json({
       status: "sucess",
-      data: {
         account,
-      },
     });
   } catch (err) {
     res.status(400).json({
