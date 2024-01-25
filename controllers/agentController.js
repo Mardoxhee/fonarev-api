@@ -17,7 +17,7 @@ exports.createAgent = async (req, res) => {
       return res.status(400).json({
         status: 'failed',
         message: "Une erreur s'est produite lors de la création de l'agent.",
-        error: `La clé ${conflictKey} est en conflit. Veuillez saisir des valeurs uniques.`,
+        error: `Le contenu du champ  ${conflictKey} Existe déjà. Veuillez saisir des valeurs uniques.`,
       });
     }
 };
