@@ -9,15 +9,19 @@ exports.createAgent = async (req, res) => {
       status: "Agent enregistré avec succès !",
       newAgent,
     });
-  } catch (err) {
-    res.status(500).json({
-      status: "failed",
-      message: "Une erreur s'est produite lors de la création de l'agent.",
-      error: err.message,
-    });
-  }
-};
+  } catch (error) {
+    if (error.code === 11000 && error.keyPattern) {
+      // Extraire le nom de l'index ou de la clé
+      const conflictKey = Object.keys(error.keyPattern)[0];
 
+      return res.status(400).json({
+        status: 'failed',
+        message: "Une erreur s'est produite lors de la création de l'agent.",
+        error: `La clé ${conflictKey} est en conflit. Veuillez saisir des valeurs uniques.`,
+      });
+    }
+};
+}
   //Le controlleur d'affichage de tous les agents
   exports.getAgents = async (req, res) => {
     try {
