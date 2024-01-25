@@ -40,7 +40,7 @@ const agentSchema = new mongoose.Schema({
       // },
       phone: {
         type: String,
-        unique: true,
+        unique: [true, "Ce numéro de téléphone existe déjà"],
         // required: [true, "An account has to have a phone number"],
         validate: [validator.isMobilePhone, "please provide a good phone number"],
       },
