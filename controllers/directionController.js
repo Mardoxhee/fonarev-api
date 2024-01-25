@@ -67,7 +67,7 @@ exports.updateDirection = async (req, res) => {
       runValidators: true,
     });
     res.status(200).json({
-      statusstatus: "success",
+      status: "Direction modifié avec succès",
       direction,
     });
   } catch (err) {
