@@ -27,6 +27,9 @@ const agentSchema = new mongoose.Schema({
     province: {
         type: String,
       },
+      nationalite: {
+        type: String,
+      },
       provinceOrigin: {
         type: String,
       },
@@ -37,7 +40,6 @@ const agentSchema = new mongoose.Schema({
       dateNaissance : {
         type: Date,
       },
-
       phone: {
         type: String,
         unique: [true, "Ce numéro de téléphone existe déjà"],
