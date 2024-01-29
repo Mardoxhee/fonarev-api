@@ -29,7 +29,7 @@ exports.createAgent = async (req, res) => {
       .filter()
       .sort()
       .limitFields()
-      const agents = await features.query.populate('direction');;
+      const agents = await features.query.populate('direction').populate('service');;;
       res.status(200).json({
         status: "Success",
         numberOfAgents: agents.length,
