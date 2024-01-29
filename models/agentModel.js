@@ -34,10 +34,10 @@ const agentSchema = new mongoose.Schema({
         type: String,
         // required: [true, "renseignez votre état civile"],
       },
-      // direction: {
-      //   type: String,
-      //   // required: [true, "Renseignez le nom"],
-      // },
+      dateNaissance : {
+        type: Date,
+      },
+
       phone: {
         type: String,
         unique: [true, "Ce numéro de téléphone existe déjà"],
@@ -77,7 +77,6 @@ const agentSchema = new mongoose.Schema({
       },
       photo: {
         type: String,
-        // required: [true, "Renseignez la photo de l agent"],
       },
       service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
       direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
