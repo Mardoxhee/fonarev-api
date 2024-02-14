@@ -29,7 +29,7 @@ exports.getAllNd = async (req, res) => {
     const notedebit = await features.query.populate('agent');
     res.status(200).json({
       status: "Success",
-      numberOfNote: service.length,
+      numberOfNote: notedebit.length,
       notedebit,
     });
   } catch (err) {
