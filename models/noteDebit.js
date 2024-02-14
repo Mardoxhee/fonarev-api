@@ -25,7 +25,7 @@ const noteDebitSchema = new mongoose.Schema({
     required: [true, "Renseignez le poids "],
   },
   nature: {
-    type: Number,
+    type: String,
     required: [true, "Renseignez la nature du produit "],
   },
   montantBrut: {
