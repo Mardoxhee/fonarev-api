@@ -25,10 +25,10 @@ const entrepriseMineSchema = new mongoose.Schema({
     required: [true, "Numéro detéléphone du responsable"],
   },
   EmailResponsable: {
-    type: Number,
+    type: String,
     required: [true, "Email du responsable"],
   },
-  EmailResponsable : { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+
 
 });
 
