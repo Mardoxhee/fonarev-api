@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const noteDebitSchema = new mongoose.Schema({
   date: {
         type: Date,
-        required: [true, "Indiquez la date de na note de débit"],
+        required: [true, "Indiquez la date de declaration de la note de débit"],
       },
   province: {
     type: String,
@@ -40,38 +40,38 @@ const noteDebitSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Renseignez le montant du au fonarev"],
   },
-  numeroNP: {
-    type: String,
-    required: [true, "Renseignez le numéro de la note de perception"],
-  },
-  dateEmissionNp: {
-    type: Date,
-    // required: [true, "Renseignez la date d emission de la note de perception"],
-  },
-  dateAr: {
-    type: Date,
-    // required: [true, "Renseignez le numéro de la note de perception"],
-  },
-  datePaiement: {
-    type: Date,
-    // required: [true, "Renseignez le numéro de la note de perception"],
-  },
-  numeroPreuvePaiement: {
-    type: String,
-    // required: [true, "Renseignez le numéro de la note de perception"],
-  },
-  montantPaye: {
-    type: Number,
-    // required: [true, "Renseignez le numéro de la note de perception"],
-  },
-  solde: {
-    type: Number,
-    // required: [true, "Renseignez le numéro de la note de perception"],
-  },
-  deadlinePaiement: {
-    type: Date,
-    // required: [true, "Renseignez le numéro de la note de perception"],
-  },
+  // numeroNP: {
+  //   type: String,
+  //   required: [true, "Renseignez le numéro de la note de perception"],
+  // },
+  // dateEmissionNp: {
+  //   type: Date,
+  //   // required: [true, "Renseignez la date d emission de la note de perception"],
+  // },
+  // dateAr: {
+  //   type: Date,
+  //   // required: [true, "Renseignez le numéro de la note de perception"],
+  // },
+  // datePaiement: {
+  //   type: Date,
+  //   // required: [true, "Renseignez le numéro de la note de perception"],
+  // },
+  // numeroPreuvePaiement: {
+  //   type: String,
+  //   // required: [true, "Renseignez le numéro de la note de perception"],
+  // },
+  // montantPaye: {
+  //   type: Number,
+  //   // required: [true, "Renseignez le numéro de la note de perception"],
+  // },
+  // solde: {
+  //   type: Number,
+  //   // required: [true, "Renseignez le numéro de la note de perception"],
+  // },
+  // deadlinePaiement: {
+  //   type: Date,
+  //   // required: [true, "Renseignez le numéro de la note de perception"],
+  // },
   Observation: {
     type: String,
     // required: [true, "Renseignez le numéro de la note de perception"],
