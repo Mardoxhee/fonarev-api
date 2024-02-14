@@ -5,6 +5,7 @@ const AccountRouter = require("./routes/accountRoutes");
 const AgentRouter = require("./routes/agentRoutes");
 const DirectionRouter = require("./routes/directionRoutes");
 const ServiceRouter = require("./routes/serviceRoutes");
+const entrepriseMineRouter = require("./routes/accountRoutes")
 
 app.use(bp.json())
 var cors = require("cors");
@@ -26,5 +27,6 @@ app.use("/agents", cors(corsOptions), AgentRouter);
 app.use("/accounts", cors(corsOptions), AccountRouter);
 app.use("/directions", cors(corsOptions), DirectionRouter);
 app.use("/services", cors(corsOptions), ServiceRouter);
+app.use("/entrepriseminieres", cors(corsOptions), entrepriseMineRouter);
 
 module.exports = app;
