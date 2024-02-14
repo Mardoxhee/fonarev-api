@@ -12,6 +12,10 @@ const noteDebitSchema = new mongoose.Schema({
     type: String,
     required: [true, "Indiquez la province"],
   },
+  entite: {
+    type: String,
+    required: [true, "Indiquez l entite"],
+  },
   numeroND: {
     type: String,
     required: [true, "Renseignez le numéro de la ND"],
@@ -76,7 +80,7 @@ const noteDebitSchema = new mongoose.Schema({
     type: String,
     // required: [true, "Renseignez le numéro de la note de perception"],
   },
-  entrepriseMine: { type: mongoose.Schema.Types.ObjectId, ref: "entrepriseMine" },
+  entrepriseMine: { type: mongoose.Schema.Types.ObjectId, ref: "EntrepriseMine" },
   agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
 });
 
