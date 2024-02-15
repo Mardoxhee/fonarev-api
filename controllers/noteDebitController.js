@@ -26,7 +26,7 @@ exports.getAllNd = async (req, res) => {
       .sort()
       .limitFields()
       .paginate();
-    const notedebit = await features.query.populate('agent').populate('entrepriseMine');
+    const notedebit = await features.query.populate('account').populate('entrepriseMine');
     res.status(200).json({
       status: "Success",
       numberOfNote: notedebit.length,
@@ -43,7 +43,7 @@ exports.getAllNd = async (req, res) => {
 exports.getOneNd = async (req, res) => {
   try {
     const notedebit = await Notedebit.findById(req.params.id)
-    .populate('agent').populate('entrepriseMine');
+    .populate('account').populate('entrepriseMine');
     res.status(200).json({
         status: "success",
         notedebit,
