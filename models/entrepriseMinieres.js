@@ -28,8 +28,7 @@ const entrepriseMineSchema = new mongoose.Schema({
     type: String,
     required: [true, "Email du responsable"],
   },
-
-
+  notedebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
 });
 
 // declaration du model
