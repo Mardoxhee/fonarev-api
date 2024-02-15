@@ -81,7 +81,8 @@ const noteDebitSchema = new mongoose.Schema({
     type: String,
     // required: [true, "Renseignez le numéro de la note de perception"],
   },
-  entrepriseMine: { type: mongoose.Schema.Types.ObjectId, ref: "EntrepriseMine" },
+  entrepriseMine: { type: mongoose.Schema.Types.ObjectId, ref: 'EntrepriseMine', // Assurez-vous que c'est le même que le modèle entrepriseMine
+  },
   agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
 });
 
