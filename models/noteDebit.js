@@ -87,7 +87,7 @@ const noteDebitSchema = new mongoose.Schema({
   },
   entrepriseMine: { type: mongoose.Schema.Types.ObjectId, ref: 'EntrepriseMine', // Assurez-vous que c'est le même que le modèle entrepriseMine
   },
-  agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 // declaration du model
