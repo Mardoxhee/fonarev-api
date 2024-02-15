@@ -10,6 +10,8 @@ const noteDebitRouter = require("./routes/noteDebitRoutes")
 
 app.use(bp.json())
 var cors = require("cors");
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 const corsOptions = {
     origin:"*",
