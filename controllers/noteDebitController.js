@@ -5,6 +5,7 @@ exports.createNd = async (req, res) => {
   try {
     const bodies = req.body;
     bodies.account = req.decoded.id;
+    bodies.dateEncodage = new Date();
     const newNotedebit = await Notedebit.create(bodies);
     res.status(201).json({
       status: "note created successfully",

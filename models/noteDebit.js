@@ -9,6 +9,10 @@ const noteDebitSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Indiquez la date de declaration de la note de débit"],
       },
+      dateEncodage: {
+        type: Date,
+        required: [true, "Indiquez la date de declaration de la note de débit"],
+      },
   province: {
     type: String,
     required: [true, "Indiquez la province"],
@@ -44,6 +48,22 @@ const noteDebitSchema = new mongoose.Schema({
   montantFonarev: {
     type: Number,
     required: [true, "Renseignez le montant du au fonarev"],
+  },
+  montantTresor: {
+    type: Number,
+    // required: [true, "Renseignez le montant du au fonarev"],
+  },
+  montantProvince: {
+    type: Number,
+    // required: [true, "Renseignez le montant du au fonarev"],
+  },
+  montantTerritoire: {
+    type: Number,
+    // required: [true, "Renseignez le montant du au fonarev"],
+  },
+  fondsMiniers: {
+    type: Number,
+    // required: [true, "Renseignez le montant du au fonarev"],
   },
   // numeroNP: {
   //   type: String,
