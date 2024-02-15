@@ -42,28 +42,28 @@ const agentSchema = new mongoose.Schema({
       },
       phone: {
         type: String,
-        unique: [true, "Ce numéro de téléphone existe déjà"],
+        // unique: [true, "Ce numéro de téléphone existe déjà"],
         // required: [true, "An account has to have a phone number"],
         validate: [validator.isMobilePhone, "please provide a good phone number"],
       },
       emailPerso: {
         type: String,
         // required: [true, "please provide a mail "],
-        unique: true,
+        // unique: true,
         lowercase: true,
         validate: [validator.isEmail, "please provide a valid mail"],
       },
       emailPro: {
         type: String,
         // required: [true, "please provide a mail "],
-        unique: true,
+        // unique: true,
         lowercase: true,
         validate: [validator.isEmail, "please provide a valid mail"],
       },
       matricule: {
         type: Number,
         // required: [true, "Renseignez le numéro matricule"],
-        unique: [true, "deux agents ne peuvent pas avoir le même matricule"],
+        // unique: [true, "deux agents ne peuvent pas avoir le même matricule"],
       },
       grade: {
         type: String,
