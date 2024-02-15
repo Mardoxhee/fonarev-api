@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 // const crypto = require("crypto");
 
 const noteDebitSchema = new mongoose.Schema({
+  
   date: {
         type: Date,
         required: [true, "Indiquez la date de declaration de la note de débit"],
