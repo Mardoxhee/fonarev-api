@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
 const accountSchema = new mongoose.Schema({
+  noteDebit: { type: mongoose.Schema.Types.ObjectId, ref: "NoteDebit" },
   lastName: {
     type: String,
     required: [true, "an account must have a lastName"],
