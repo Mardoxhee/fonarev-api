@@ -82,6 +82,7 @@ const agentSchema = new mongoose.Schema({
       },
       service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
       direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
+      noteDebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
 })
 
 const Agents = mongoose.model("Agents", agentSchema);
