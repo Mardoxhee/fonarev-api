@@ -9,7 +9,7 @@ const noteDebitSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Indiquez la date de declaration de la note de débit"],
       },
-      dateEncodage: {
+  dateEncodage: {
         type: Date,
         required: [true, "Indiquez la date de declaration de la note de débit"],
       },
