@@ -1,14 +1,14 @@
-const Service = require("./../models/serviceModel");
+const ProduitsMine = require("./../models/produitsMine");
 const APIfeatures = require("./../utils/apiFeatures");
 
-exports.createService = async (req, res) => {
+exports.createProduct = async (req, res) => {
   try {
     const bodies = req.body;
     bodies.account = req.decoded.id;
-    const newService = await Service.create(bodies);
+    const newProduct = await ProduitsMine.create(bodies);
     res.status(201).json({
-      status: "service created successfully",
-      newService,
+      status: "produit created successfully",
+      newProduct,
     });
   } catch (err) {
     res.status(400).json({
@@ -19,19 +19,19 @@ exports.createService = async (req, res) => {
   }
 };
 
-exports.getAllServices = async (req, res) => {
+exports.getAllProducts = async (req, res) => {
   try {
-    const features = new APIfeatures(Service.find(), req.query)
+    const features = new APIfeatures(ProduitsMine.find(), req.query)
       .filter()
       .sort()
       .limitFields()
       .paginate();
-    const service = await features.query.populate('direction');
+    const produit = await features.query;
 
     res.status(200).json({
       status: "Success",
-      numberOfServices: service.length,
-      service,
+      numberOfServices: produit.length,
+      produit,
     });
   } catch (err) {
     res.status(400).json({
@@ -41,13 +41,12 @@ exports.getAllServices = async (req, res) => {
   }
 };
 
-exports.getOneService = async (req, res) => {
+exports.getOneProduct = async (req, res) => {
   try {
-    const service = await Service.findById(req.params.id)
-    .populate("agents");
+    const produit = await ProduitsMine.findById(req.params.id)
     res.status(200).json({
         status: "success",
-        service,
+        produit,
       });
   } catch (err) {
     res.status(400).json({
@@ -57,15 +56,15 @@ exports.getOneService = async (req, res) => {
   }
   
 };
-exports.updateService = async (req, res) => {
+exports.updateProduct = async (req, res) => {
   try {
-    const service = await Service.findByIdAndUpdate(req.params.id, req.body, {
+    const produit = await ProduitsMine.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
     res.status(200).json({
       statusstatus: "success",
-      service,
+      produit,
     });
   } catch (err) {
     res.status(400).json({
@@ -75,9 +74,9 @@ exports.updateService = async (req, res) => {
   }
 };
 
-exports.deleteService = async (req, res) => {
+exports.deleteProduct = async (req, res) => {
   try {
-    await Service.findByIdAndDelete(req.params.id);
+    await ProduitsMine.findByIdAndDelete(req.params.id);
     res.status(200).json({
       status: "Service deleted successfully",
       data: null,
