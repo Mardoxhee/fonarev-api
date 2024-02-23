@@ -7,6 +7,7 @@ const DirectionRouter = require("./routes/directionRoutes");
 const ServiceRouter = require("./routes/serviceRoutes");
 const entrepriseMineRouter = require("./routes/entrepriseMineRoutes")
 const noteDebitRouter = require("./routes/noteDebitRoutes")
+const produitsRouter = require("./routes/produitsMine")
 
 app.use(bp.json())
 var cors = require("cors");
@@ -33,5 +34,6 @@ app.use("/directions", cors(corsOptions), DirectionRouter);
 app.use("/services", cors(corsOptions), ServiceRouter);
 app.use("/entrepriseminieres", cors(corsOptions), entrepriseMineRouter);
 app.use("/notededebit", cors(corsOptions), noteDebitRouter);
+app.use("/produits-miniers", cors(corsOptions), produitsRouter);
 
 module.exports = app;
