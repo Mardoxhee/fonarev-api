@@ -4,7 +4,9 @@ const mongoose = require("mongoose");
 const articleSchema = new mongoose.Schema({
   
 
-
+  date : {
+      type : Date
+  },
   titre: {
     type: String,
     required: [true, "Rentrez un titre"],
