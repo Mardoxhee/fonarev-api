@@ -5,6 +5,7 @@ exports.createArticle = async (req, res) => {
   try {
     const bodies = req.body;
     bodies.account = req.decoded.id;
+    bodies.date = new Date(); 
     const newArticle = await Article.create(bodies);
     res.status(201).json({
       status: "Article created successfully",
