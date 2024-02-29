@@ -15,5 +15,5 @@ const produitsMineSchema = new mongoose.Schema({
 });
 
 // declaration du model
-const Service = mongoose.model("ProduitsMine", produitsMineSchema);
-module.exports = Service;
+const ProduitsMine = mongoose.model("ProduitsMine", produitsMineSchema);
+module.exports = ProduitsMine;
