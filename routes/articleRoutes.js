@@ -11,7 +11,7 @@ const {
 
   } = require("../controllers/articlesController");
 
-  router.route("/").get(getAllArticles).post(createArticle);
+  router.route("/").get(getAllArticles).post(protect, createArticle);
   router
   .route("/:id")
   .get(getOneArticle)
