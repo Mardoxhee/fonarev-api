@@ -10,9 +10,14 @@ const provinceSchema = new mongoose.Schema({
   superficie: {
     type: Number,
   },
-
   description: {
     type: String,
+  },
+  chef_lieu: {
+    type: String,
+  },
+  population: {
+    type: Number,
   },
 
 
