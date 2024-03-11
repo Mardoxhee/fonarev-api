@@ -19,9 +19,6 @@ const provinceSchema = new mongoose.Schema({
   population: {
     type: Number,
   },
-
-
- 
   ville: { type: mongoose.Schema.Types.ObjectId, ref: "Ville" },
 });
 
