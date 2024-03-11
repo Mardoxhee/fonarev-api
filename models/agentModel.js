@@ -2,12 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 const agentSchema = new mongoose.Schema({
-    // numero: {
-    //   type: Number,
-    //   unique: true, // Assurez-vous que le numéro est unique
-    //   min: 1,
-    //   max: 9999, // Limitez la plage de numéros de 1 à 9999
-    // },
+
     nom: {
       type: String,
       // required: [true, "Renseignez le nom"],
@@ -42,28 +37,19 @@ const agentSchema = new mongoose.Schema({
       },
       phone: {
         type: String,
-        // unique: [true, "Ce numéro de téléphone existe déjà"],
-        // required: [true, "An account has to have a phone number"],
-        // validate: [validator.isMobilePhone, "please provide a good phone number"],
+
       },
       emailPerso: {
         type: String,
-        // required: [true, "please provide a mail "],
-        // unique: true,
-        // lowercase: true,
-        // validate: [validator.isEmail, "please provide a valid mail"],
+
       },
       emailPro: {
         type: String,
-        // required: [true, "please provide a mail "],
-        // unique: true,
-        // lowercase: true,
-        // validate: [validator.isEmail, "please provide a valid mail"],
+
       },
       matricule: {
         type: String,
-        // required: [true, "Renseignez le numéro matricule"],
-        // unique: [true, "deux agents ne peuvent pas avoir le même matricule"],
+
       },
       grade: {
         type: String,

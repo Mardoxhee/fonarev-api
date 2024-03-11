@@ -1,4 +1,5 @@
 const express = require("express");
+const fs = require('fs')
 const app = express();
 const bp = require('body-parser');
 const AccountRouter = require("./routes/accountRoutes");
@@ -9,6 +10,9 @@ const entrepriseMineRouter = require("./routes/entrepriseMineRoutes")
 const noteDebitRouter = require("./routes/noteDebitRoutes")
 const produitsRouter = require("./routes/produitsMine")
 const articleRouter = require("./routes/articleRoutes")
+const villeRouter = require ("./routes/villeRoutes")
+const provinceRouter = require("./routes/provinceRoutes")
+
 
 app.use(bp.json())
 var cors = require("cors");
@@ -29,6 +33,10 @@ const corsOptions = {
       "Welcom to fonarev API========== copy this link to read the documenation of this api ======================== https://docs.google.com/document/d/1qo06FtuJOP4jzVf2ewAspeEGRnIJEly3b4ZzpQ7tGxg/edit?usp=sharing"
     );
   });
+
+
+
+
 app.use("/agents", cors(corsOptions), AgentRouter);
 app.use("/accounts", cors(corsOptions), AccountRouter);
 app.use("/directions", cors(corsOptions), DirectionRouter);
@@ -37,6 +45,8 @@ app.use("/entrepriseminieres", cors(corsOptions), entrepriseMineRouter);
 app.use("/notededebit", cors(corsOptions), noteDebitRouter);
 app.use("/produits-miniers", cors(corsOptions), produitsRouter);
 app.use("/articles", cors(corsOptions), articleRouter);
+app.use("/villes", cors(corsOptions), villeRouter);
+app.use("/provinces", cors(corsOptions),provinceRouter);
 
 
 module.exports = app;
