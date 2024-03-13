@@ -25,8 +25,6 @@ const articleSchema = new mongoose.Schema({
     type: String,
     required: [true, "Rentrez le contenu de l'article"],
   },
-
-
   type: {
     type: Number,
     default: 2, 

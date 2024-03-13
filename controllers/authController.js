@@ -69,9 +69,13 @@ exports.login = async (req, res, next) => {
     // 3) if every thing is ok, then send the token to the client and
 
     const token = signToken(account._id);
+    
     res.status(200).json({
       status: "connected to the platform",
       accountId: account._id,
+      first_name:account.prenom,
+      user_name:account.nom,
+      email : account.email,
       token,
     });
   } catch (err) {
