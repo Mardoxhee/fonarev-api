@@ -12,6 +12,7 @@ const produitsRouter = require("./routes/produitsMine")
 const articleRouter = require("./routes/articleRoutes")
 const villeRouter = require ("./routes/villeRoutes")
 const provinceRouter = require("./routes/provinceRoutes")
+const storiesRoutes = require("./routes/storiesRoutes")
 
 
 app.use(bp.json())
@@ -47,6 +48,7 @@ app.use("/produits-miniers", cors(corsOptions), produitsRouter);
 app.use("/articles", cors(corsOptions), articleRouter);
 app.use("/villes", cors(corsOptions), villeRouter);
 app.use("/provinces", cors(corsOptions),provinceRouter);
+app.use("/stories", cors(corsOptions), storiesRoutes);
 
 
 module.exports = app;
