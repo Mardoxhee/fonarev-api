@@ -33,7 +33,16 @@ const articleSchema = new mongoose.Schema({
     type: [String], 
     // required: [true, "Au moins une photo est requise"],
   },
- 
+  status: {
+    type: Boolean,
+    default : false 
+    // required: [true, "Au moins une photo est requise"],
+  },
+  isActived: {
+    type: Boolean,
+    default : true 
+    // required: [true, "Au moins une photo est requise"],
+  },
   agent: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
