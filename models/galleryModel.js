@@ -3,21 +3,21 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
-const storiesSchema = new mongoose.Schema({
-  titre: {
+const gallerySchema = new mongoose.Schema({
+  url: {
     type: String,
-    required: [true, "Une story doit avoir un titre"],
+    required: [true, "Un service doit avoir un nom"],
   },
   descrption: {
     type: String,
+    required: [true, "Rajoutez une brève desription pour ce service"],
   },
-  url: {
-    type: String,
-    required: [true, "le lien vers la video Youtube est obligatoire"],
+  date: {
+    type: Date,
   },
   agents: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
 });
 
 // declaration du model
-const Stories = mongoose.model("Stories", storiesSchema);
-module.exports = Stories;
+const Gallery = mongoose.model("Gallery", gallerySchema);
+module.exports = Gallery;

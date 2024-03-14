@@ -1,14 +1,15 @@
-const Stories = require("./../models/storiesModel");
+const Gallery = require("./../models/galleryModel");
 const APIfeatures = require("./../utils/apiFeatures");
 
-exports.createStories = async (req, res) => {
+exports.createGallery = async (req, res) => {
   try {
     const bodies = req.body;
     bodies.account = req.decoded.id;
-    const newStory = await Stories.create(bodies);
+    bodies.date = date.now()
+    const newGallery = await Gallery.create(bodies);
     res.status(201).json({
-      status: "story created successfully",
-      newStory,
+      status: "Gallery created successfully",
+      newGallery,
     });
   } catch (err) {
     res.status(400).json({
@@ -19,19 +20,18 @@ exports.createStories = async (req, res) => {
   }
 };
 
-exports.getAllStories = async (req, res) => {
+exports.getAllGalleries = async (req, res) => {
   try {
-    const features = new APIfeatures(Stories.find(), req.query)
+    const features = new APIfeatures(Gallery.find(), req.query)
       .filter()
       .sort()
       .limitFields()
       .paginate();
-    const stories = await features.query
-
+    const gallery = await features.query;
     res.status(200).json({
       status: "Success",
-      numberOfStories: stories.length,
-      stories,
+      numberOfPictures: gallery.length,
+      gallery,
     });
   } catch (err) {
     res.status(400).json({
@@ -41,12 +41,13 @@ exports.getAllStories = async (req, res) => {
   }
 };
 
-exports.getOneStory = async (req, res) => {
+exports.getOneGallery = async (req, res) => {
   try {
-    const story = await Stories.findById(req.params.id)
+    const gallery = await Gallery.findById(req.params.id)
+    .populate("agents");
     res.status(200).json({
         status: "success",
-        story,
+        gallery,
       });
   } catch (err) {
     res.status(400).json({
@@ -56,15 +57,15 @@ exports.getOneStory = async (req, res) => {
   }
   
 };
-exports.updateStory = async (req, res) => {
+exports.updateGallery = async (req, res) => {
   try {
-    const story = await Stories.findByIdAndUpdate(req.params.id, req.body, {
+    const gallery = await Gallery.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
     res.status(200).json({
       statusstatus: "success",
-      story,
+      gallery,
     });
   } catch (err) {
     res.status(400).json({
@@ -74,11 +75,11 @@ exports.updateStory = async (req, res) => {
   }
 };
 
-exports.deleteStory = async (req, res) => {
+exports.deleteGallery = async (req, res) => {
   try {
-    await Stories.findByIdAndDelete(req.params.id);
+    await Gallery.findByIdAndDelete(req.params.id);
     res.status(200).json({
-      status: "Story deleted successfully",
+      status: "Gallery deleted successfully",
       data: null,
     });
   } catch (err) {
