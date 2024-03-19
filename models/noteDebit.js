@@ -107,6 +107,8 @@ const noteDebitSchema = new mongoose.Schema({
   },
   entrepriseMine: { type: mongoose.Schema.Types.ObjectId, ref: 'EntrepriseMine', // Assurez-vous que c'est le même que le modèle entrepriseMine
   },
+  province: { type: mongoose.Schema.Types.ObjectId, ref: 'Province', // Assurez-vous que c'est le même que le modèle entrepriseMine
+},
   account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
