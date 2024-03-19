@@ -7,6 +7,7 @@ const produitsMineSchema = new mongoose.Schema({
   denomination: {
     type: String,
     required: [true, "Donnez un nom  à votre produit"],
+    unique: true,
   },
   categorie: {
     type: String,

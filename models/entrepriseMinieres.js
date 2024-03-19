@@ -7,6 +7,7 @@ const entrepriseMineSchema = new mongoose.Schema({
   denomination: {
     type: String,
     required: [true, "Une entreprise minière doit avoir un nom"],
+    unique: true,
   },
   province: {
     type: String,
