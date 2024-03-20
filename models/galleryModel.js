@@ -15,7 +15,7 @@ const gallerySchema = new mongoose.Schema({
   date: {
     type: Date,
   },
-  agents: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 // declaration du model

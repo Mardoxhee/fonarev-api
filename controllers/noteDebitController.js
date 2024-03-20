@@ -44,7 +44,7 @@ exports.getAllNd = async (req, res) => {
 exports.getOneNd = async (req, res) => {
   try {
     const notedebit = await Notedebit.findById(req.params.id)
-    .populate('account').populate('entrepriseMine').populate('province').populate("ProduitsMine");
+    .populate('account').populate('entrepriseMine').populate('province').populate("produit");
     res.status(200).json({
         status: "success",
         notedebit,

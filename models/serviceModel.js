@@ -14,7 +14,7 @@ const serviceSchema = new mongoose.Schema({
   },
   responsable : { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
   direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
-  agents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Agent" }],
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 // declaration du model
