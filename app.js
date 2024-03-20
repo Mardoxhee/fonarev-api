@@ -50,7 +50,7 @@ app.use("/articles", cors(corsOptions), articleRouter);
 app.use("/villes", cors(corsOptions), villeRouter);
 app.use("/provinces", cors(corsOptions),provinceRouter);
 app.use("/stories", cors(corsOptions), storiesRoutes);
-app.use("/categories", cors(corsOptions), categoryRoutes);
+app.use("/categories-mine", cors(corsOptions), categoryRoutes);
 
 
 module.exports = app;
