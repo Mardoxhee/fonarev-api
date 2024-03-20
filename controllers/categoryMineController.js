@@ -26,7 +26,7 @@ exports.getAllCategories = async (req, res) => {
       .sort()
       .limitFields()
       .paginate();
-    const categories = await features.query.populate('direction');
+    const categories = await features.query
 
     res.status(200).json({
       status: "Success",
