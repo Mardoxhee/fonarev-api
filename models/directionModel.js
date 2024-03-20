@@ -14,6 +14,7 @@ const accountSchema = new mongoose.Schema({
   },
   directeur : { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
   services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 // declaration du model

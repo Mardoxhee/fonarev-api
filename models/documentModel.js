@@ -7,7 +7,7 @@ const documentSchema = new mongoose.Schema({
   },
   description: String,
   file: String, 
-  agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agents" },
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 const Document = mongoose.model("Document", documentSchema);

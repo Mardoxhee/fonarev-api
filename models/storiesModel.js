@@ -15,7 +15,7 @@ const storiesSchema = new mongoose.Schema({
     type: String,
     required: [true, "le lien vers la video Youtube est obligatoire"],
   },
-  agents: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 // declaration du model
