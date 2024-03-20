@@ -13,10 +13,6 @@ const noteDebitSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Indiquez la date de declaration de la note de débit"],
       },
-  province: {
-    type: String,
-    required: [true, "Indiquez la province"],
-  },
   entite: {
     type: String,
     required: [true, "Indiquez l entite"],
@@ -103,10 +99,9 @@ const noteDebitSchema = new mongoose.Schema({
   },
   Observation: {
     type: String,
-    // required: [true, "Renseignez le numéro de la note de perception"],
   },
-  entrepriseMine: { type: mongoose.Schema.Types.ObjectId, ref: 'EntrepriseMine', // Assurez-vous que c'est le même que le modèle entrepriseMine
-  },
+  produit: { type: mongoose.Schema.Types.ObjectId, ref: 'ProduitsMine'},
+  entrepriseMine: { type: mongoose.Schema.Types.ObjectId, ref: 'EntrepriseMine'},
   province: { type: mongoose.Schema.Types.ObjectId, ref: 'Province', // Assurez-vous que c'est le même que le modèle entrepriseMine
 },
   account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },

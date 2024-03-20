@@ -32,6 +32,6 @@ const entrepriseMineSchema = new mongoose.Schema({
   notedebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
 });
 
-// declaration du model
+
 const EntrepriseMine = mongoose.model("EntrepriseMine", entrepriseMineSchema);
 module.exports = EntrepriseMine;
