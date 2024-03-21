@@ -13,7 +13,7 @@ const categorySchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  agents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Agent" }],
+  agents: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 // declaration du model
