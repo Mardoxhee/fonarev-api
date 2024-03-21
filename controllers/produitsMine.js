@@ -26,7 +26,7 @@ exports.getAllProducts = async (req, res) => {
       .sort()
       .limitFields()
       .paginate();
-    const produit = await features.query;
+    const produit = await features.query.populate('categorie').populate("account")
 
     res.status(200).json({
       status: "Success",
