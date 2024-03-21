@@ -26,8 +26,7 @@ exports.getAllEntrepriseMine = async (req, res) => {
       .sort()
       .limitFields()
       .paginate();
-    const entrepriseMine = await features.query;
-
+    const entrepriseMine = await features.query.populate('province');
     res.status(200).json({
       status: "Success",
       numberOfEntreprise: entrepriseMine.length,

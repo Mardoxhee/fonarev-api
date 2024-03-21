@@ -9,10 +9,6 @@ const entrepriseMineSchema = new mongoose.Schema({
     required: [true, "Une entreprise minière doit avoir un nom"],
     unique: true,
   },
-  province: {
-    type: String,
-    required: [true, "Province où se situe l'entreprise"],
-  },
   adresse: {
     type: String,
     required: [true, "Adresse de l'entreprise"],
@@ -30,6 +26,8 @@ const entrepriseMineSchema = new mongoose.Schema({
     required: [true, "Email du responsable"],
   },
   notedebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
+  province: { type: mongoose.Schema.Types.ObjectId, ref: "Province" },
+  account :{ type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 
