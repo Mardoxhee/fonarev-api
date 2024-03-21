@@ -14,7 +14,7 @@ const produitsMineSchema = new mongoose.Schema({
     required: [true, "Chaque produit doit être lié à une catégorie"],
   },
   account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
-  categorie: { type: mongoose.Schema.Types.ObjectId, ref: 'Categorie'}
+  categorie: { type: mongoose.Schema.Types.ObjectId, ref: 'CategoryMine'}
 });
 
 // declaration du model
