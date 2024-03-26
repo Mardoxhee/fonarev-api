@@ -76,6 +76,7 @@ exports.login = async (req, res, next) => {
       firstName:account.firstName,
       lastName:account.lastName,
       email : account.email,
+      role : account.role,
       token,
     });
   } catch (err) {
