@@ -20,6 +20,7 @@ const noteDebitSchema = new mongoose.Schema({
   numeroND: {
     type: String,
     required: [true, "Renseignez le numéro de la ND"],
+    unique: true,
   },
   numeroLot: {
     type: String,
