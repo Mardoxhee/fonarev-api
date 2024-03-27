@@ -96,7 +96,7 @@ const noteDebitSchema = new mongoose.Schema({
   // },
   status: {
     type: Number,
- 
+    default: 2, 
   },
   Observation: {
     type: String,
