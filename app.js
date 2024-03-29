@@ -14,6 +14,7 @@ const villeRouter = require ("./routes/villeRoutes")
 const provinceRouter = require("./routes/provinceRoutes")
 const storiesRoutes = require("./routes/storiesRoutes")
 const categoryRoutes = require("./routes/categoryMineRoutes")
+const participantRouter = require("./routes/participantRoutes")
 
 
 app.use(bp.json())
@@ -51,6 +52,7 @@ app.use("/villes", cors(corsOptions), villeRouter);
 app.use("/provinces", cors(corsOptions),provinceRouter);
 app.use("/stories", cors(corsOptions), storiesRoutes);
 app.use("/categories-mine", cors(corsOptions), categoryRoutes);
+app.use("/colloque-sante-mentale", cors(corsOptions), participantRouter);
 
 
 module.exports = app;
