@@ -28,7 +28,7 @@ exports.getAllparticipants = async (req, res) => {
     const participants = await features.query;
     res.status(200).json({
       status: "Success",
-      numberOfParticipants: Participant.length,
+      participantsEffectif: Participant.length,
       participants,
     });
   } catch (err) {

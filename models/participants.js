@@ -38,6 +38,9 @@ const participantSchema = new mongoose.Schema({
     type: String,
     required: [true, "Renseignez votre secteur d'activité ou votre profession"],
   },
+  description: {
+    type: String,
+  },
 });
 
 // declaration du model

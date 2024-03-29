@@ -11,7 +11,7 @@ const {
 
   } = require("../controllers/ParticipantController");
 
-  router.route("/").get(protect, getAllparticipants).post(protect, createParticipant);
+  router.route("/").get(getAllparticipants).post(createParticipant);
   router
   .route("/:id")
   .get(getOneParticipant)
