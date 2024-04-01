@@ -10,7 +10,7 @@ exports.createParticipant = async (req, res) => {
     await sendMail({
       to: newParticipant.email, // Utiliser newParticipant au lieu de newAccount
       subject: "Participation au colloque",
-      html: "<p>Vous êtes préenregistré pour le colloque</p>",
+      html: "<p>Merci d’avoir soumis votre demande pour la participation au colloque sur la santé mentale des victimes.Vous êtes pré-enregistré(e) au colloque. Nous vous confirmerons votre participation par mail. <br>Cordialement,</p>",
     });
 
     res.status(201).json({
