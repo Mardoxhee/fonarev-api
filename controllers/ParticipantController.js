@@ -1,14 +1,24 @@
 const Participant = require("./../models/participants");
 const APIfeatures = require("./../utils/apiFeatures");
+const sendMail = require('./../utils/email');
 
 exports.createParticipant = async (req, res) => {
   try {
-
     const newParticipant = await Participant.create(req.body);
+    
+    // Envoyer l'e-mail
+    await sendMail({
+      to: newParticipant.email, // Utiliser newParticipant au lieu de newAccount
+      subject: "Participation au colloque",
+      html: "<p>Vous êtes préenregistré pour le colloque</p>",
+    });
+
     res.status(201).json({
       status: "Participant created successfully",
       newParticipant,
     });
+
+    console.log("Email sent"); // Déplacer la console.log ici si nécessaire
   } catch (err) {
     res.status(400).json({
       status: "failed",
@@ -17,6 +27,7 @@ exports.createParticipant = async (req, res) => {
     }); 
   }
 };
+
 
 exports.getAllparticipants = async (req, res) => {
   try {

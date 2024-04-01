@@ -9,10 +9,9 @@ const sendMail = async (options) => {
     })
   );
 
-  // 2) Define the email options
-
+ 
   const mailOptions = {
-    from: "yuding.platform@gmail.com",
+    from: "mardochee.luviki@fonarev.cd",
     to: options.to,
     subject: options.subject,
     message: options.message,
