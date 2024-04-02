@@ -5,8 +5,6 @@ const sendMail = require('./../utils/email');
 exports.createParticipant = async (req, res) => {
   try {
     const newParticipant = await Participant.create(req.body);
-    
-    // Envoyer l'e-mail
     await sendMail({
       to: newParticipant.email, // Utiliser newParticipant au lieu de newAccount
       subject: "Participation au colloque",
