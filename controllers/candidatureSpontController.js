@@ -18,6 +18,8 @@ exports.createCandidature = async (req, res) => {
              <p>Nom: ${newCandidature.nom}</p>
              <p>Prénom: ${newCandidature.prenom}</p>
              <p>Ville: ${newCandidature.ville}</p>
+             <p>Téléphone: ${newCandidature.phone}</p>
+             <p>E-mail: ${newCandidature.email}</p>
              CV: <a href="${newCandidature.cv}">Télécharger le CV</a>
              Lettre de motivation: <a href="${newCandidature.lm}">Télécharger la lettre de motivation</a>
              <p>Cordialement,</p>`,
