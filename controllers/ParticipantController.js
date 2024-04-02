@@ -12,7 +12,6 @@ exports.createParticipant = async (req, res) => {
       subject: "Participation au colloque",
       html: "<p>Merci d’avoir soumis votre demande pour la participation au colloque sur la santé mentale des victimes.Vous êtes pré-enregistré(e) au colloque. Nous vous confirmerons votre participation par mail. <br>Cordialement,</p>",
     });
-
     res.status(201).json({
       status: "Participant created successfully",
       newParticipant,

@@ -1,9 +1,27 @@
 const CandidatureSpont = require("./../models/candidatureSpont");
 const APIfeatures = require("./../utils/apiFeatures");
+const sendMail = require('./../utils/email');
 
 exports.createCandidature = async (req, res) => {
   try {
     const newCandidature = await CandidatureSpont.create(req.body);
+    await sendMail({
+      to: newCandidature.email, // Utiliser newParticipant au lieu de newAccount
+      subject: "Candidature spontanée",
+      html: "<p>Merci de nous avoir soumis votre candidature. Nous allons l'examiner et vous serez notifié à l'issue du traitement.<br>Cordialement,</p>",
+    });
+    await sendMail({
+      to: "tech_support@fonarev.cd",
+      subject: "Nouvelle candidature spontanée",
+      html: `<p>Bonjour,</p>
+             <p>Nous avons reçu une nouvelle candidature depuis le site web :</p>
+             <p>Nom: ${newCandidature.nom}</p>
+             <p>Prénom: ${newCandidature.prenom}</p>
+             <p>Ville: ${newCandidature.ville}</p>
+             CV: <a href="${newCandidature.cv}">Télécharger le CV</a>
+             Lettre de motivation: <a href="${newCandidature.lm}">Télécharger la lettre de motivation</a>
+             <p>Cordialement,</p>`,
+    });
     res.status(201).json({
       status: "candidature created successfully",
       newCandidature,

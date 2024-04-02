@@ -6,35 +6,38 @@ const crypto = require("crypto");
 const candidatureSpontSchema = new mongoose.Schema({
   nom: {
     type: String,
-    required: [true, "Un service doit avoir un nom"],
+    required: [true, "Rensegnez votre nom"],
   },
   prenom: {
     type: String,
-    required: [true, "Rajoutez une brève desription pour ce service"],
+    required: [true, "Rensegnez votre prénom"],
   },
   email: {
     type: String,
-    required: [true, "Rajoutez une brève desription pour ce service"],
+    required: [true, "Rensegnez votre adresse mail"],
   },
   phone: {
-    type: String,
-    required: [true, "Rajoutez une brève desription pour ce service"],
+    type: Number,
+    required: [true, "Rensegnez votre numéro de téléphone"],
   },
   ville: {
     type: String,
-    required: [true, "Rajoutez une brève desription pour ce service"],
+    required: [true, "Renseignez votre ville"],
   },
   province: {
     type: String,
-    required: [true, "Rajoutez une brève desription pour ce service"],
+    required: [true, "Renseignez votre province"],
   },
   lm: {
     type: String,
-    required: [true, "Rajoutez une brève desription pour ce service"],
+    required: [true, "Uploadez une lettre de motivation"],
   },
   cv: {
     type: String,
-    required: [true, "Rajoutez une brève desription pour ce service"],
+    required: [true, "uploadez un CV"],
+  },
+  date: {
+    type: Date,
   },
 
 });
