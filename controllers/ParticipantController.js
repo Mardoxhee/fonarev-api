@@ -10,6 +10,26 @@ exports.createParticipant = async (req, res) => {
       subject: "Participation au colloque",
       html: "<p>Merci d’avoir soumis votre demande pour la participation au colloque sur la santé mentale des victimes.Vous êtes pré-enregistré(e) au colloque. Nous vous confirmerons votre participation par mail. <br>Cordialement,</p>",
     });
+
+    await sendMail({
+      to: ["tech_support@fonarev.cd", "Joel.mabilama@fonarev.cd"],
+      subject: "Alerte pré-enregistrement",
+      html: `<p>Bonjour,</p>
+             <p>Nous avons reçu un noubeau pré-enregistrement depuis le site web :</p>
+             <p>Nom: ${newParticipant.nom}</p>
+             <p>Prénom: ${newParticipant.prenom}</p>
+             <p>Genre: ${newParticipant.genre}</p>
+             <p>Nationalité: ${newParticipant.nationalite}</p>
+             <p>E-mail: ${newParticipant.email}</p>
+             <p>Téléphone: ${newParticipant.telephone}</p>
+             <p>Pays: ${newParticipant.pays}</p>
+             <p>ville: ${newParticipant.ville}</p>
+             <p>profession: ${newParticipant.profession}</p>
+             <p>institution: ${newParticipant.institution}</p>
+             <p>Commentaire: ${newParticipant.description}</p>
+             <p>Cordialement,</p>`,
+    });
+
     res.status(201).json({
       status: "Participant created successfully",
       newParticipant,

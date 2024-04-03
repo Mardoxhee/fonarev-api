@@ -11,7 +11,7 @@ exports.createCandidature = async (req, res) => {
       html: "<p>Merci de nous avoir soumis votre candidature. Nous allons l'examiner et vous serez notifié à l'issue du traitement.<br>Cordialement,</p>",
     });
     await sendMail({
-      to: "tech_support@fonarev.cd",
+      to: ["tech_support@fonarev.cd", "dieudonne.wedi@fonarev.cd"],
       subject: "Nouvelle candidature spontanée",
       html: `<p>Bonjour,</p>
              <p>Nous avons reçu une nouvelle candidature depuis le site web :</p>
