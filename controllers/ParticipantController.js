@@ -15,7 +15,7 @@ exports.createParticipant = async (req, res) => {
       to: ["tech_support@fonarev.cd", "Joel.mabilama@fonarev.cd"],
       subject: "Alerte pré-enregistrement",
       html: `<p>Bonjour,</p>
-             <p>Nous avons reçu un noubeau pré-enregistrement depuis le site web :</p>
+             <p>Nous avons un nouveau pré-enregistrement depuis le site web :</p>
              <p>Nom: ${newParticipant.nom}</p>
              <p>Prénom: ${newParticipant.prenom}</p>
              <p>Genre: ${newParticipant.genre}</p>
