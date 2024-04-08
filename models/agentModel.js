@@ -15,7 +15,7 @@ const agentSchema = new mongoose.Schema({
         type: String,
         // required: [true, "Renseignez le prenom"],
       },
-    genre: {
+    sexe: {
         type: String,
         // required: [true, "Renseignez le genre"],
       },  
