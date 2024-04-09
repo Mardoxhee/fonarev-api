@@ -7,7 +7,10 @@ const agentSchema = new mongoose.Schema({
       type: String,
       // required: [true, "Renseignez le nom"],
     },
- 
+    postnom: {
+        type: String,
+        // required: [true, "Renseignez le postnom"],
+      },
     prenom: {
         type: String,
         // required: [true, "Renseignez le prenom"],
@@ -66,9 +69,11 @@ const agentSchema = new mongoose.Schema({
       service: {
         type: String,
       },
-   
+      direction: {
+        type: String,
+      },
       // service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
-      direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
+      // direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
       noteDebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
       account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 })
