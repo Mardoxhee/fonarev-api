@@ -9,6 +9,9 @@ const entrepriseMineSchema = new mongoose.Schema({
     required: [true, "Une entreprise minière doit avoir un nom"],
     unique: true,
   },
+  alias : {
+    type: String,
+  },
   adresse: {
     type: String,
     required: [true, "Adresse de l'entreprise"],
