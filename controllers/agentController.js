@@ -45,7 +45,7 @@ exports.createAgent = async (req, res) => {
  //Le controlleur d'affichage d'un agent à la fois
 exports.getOneAgent= async (req, res) => {
         try {
-          const agent = await Agent.findById(req.params.id).populate('direction');
+          const agent = await Agent.findById(req.params.id).populate('direction')
           res.status(200).json({
             status: "success",
             agent,

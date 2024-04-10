@@ -43,7 +43,7 @@ exports.getAllProducts = async (req, res) => {
 
 exports.getOneProduct = async (req, res) => {
   try {
-    const produit = await ProduitsMine.findById(req.params.id)
+    const produit = await ProduitsMine.findById(req.params.id).populate("categorie")
     res.status(200).json({
         status: "success",
         produit,

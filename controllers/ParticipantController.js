@@ -12,7 +12,8 @@ exports.createParticipant = async (req, res) => {
     });
 
     await sendMail({
-      to: ["tech_support@fonarev.cd", "Joel.mabilama@fonarev.cd"],
+      // to: ["tech_support@fonarev.cd", "Joel.mabilama@fonarev.cd"],
+      to: "mardochee.luviki@fonarev.cd",
       subject: "Alerte pré-enregistrement",
       html: `<p>Bonjour,</p>
              <p>Nous avons un nouveau pré-enregistrement depuis le site web :</p>
