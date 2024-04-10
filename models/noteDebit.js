@@ -11,11 +11,11 @@ const noteDebitSchema = new mongoose.Schema({
       },
   dateEncodage: {
         type: Date,
-        required: [true, "Indiquez la date de declaration de la note de débit"],
+
       },
   entite: {
     type: String,
-    required: [true, "Indiquez l entite"],
+
   },
   numeroND: {
     type: String,
@@ -24,15 +24,15 @@ const noteDebitSchema = new mongoose.Schema({
   },
   numeroLot: {
     type: String,
-    required: [true, "Renseignez le numéro du lot"],
+
   },
   poids: {
     type: Number,
-    required: [true, "Renseignez le poids "],
+
   },
   nature: {
     type: String,
-    required: [true, "Renseignez la nature du produit "],
+
   },
   montantBrut: {
     type: Number,
@@ -40,7 +40,6 @@ const noteDebitSchema = new mongoose.Schema({
   },
   montantTotal3: {
     type: Number,
-    required: [true, "Renseignez le montant total de la note de débit "],
   },
   montantFonarev: {
     type: Number,
@@ -52,6 +51,10 @@ const noteDebitSchema = new mongoose.Schema({
   },
   montantProvince: {
     type: Number,
+    // required: [true, "Renseignez le montant du au fonarev"],
+  },
+  declarationOrigine: {
+    type: String,
     // required: [true, "Renseignez le montant du au fonarev"],
   },
   montantTerritoire: {
