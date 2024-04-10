@@ -98,6 +98,9 @@ const noteDebitSchema = new mongoose.Schema({
     type: Number,
     default: 2, 
   },
+  tauxRed : {
+    type: Number,
+  },
   Observation: {
     type: String,
   },
