@@ -42,7 +42,7 @@ exports.getAllDirections = async (req, res) => {
 
 exports.getOneDirection = async (req, res) => {
   try {
-    const direction = await Direction.findById(req.params.id)
+    const direction = await Direction.findById(req.params.id).populate("directeur")
     .populate({
       path: "services",
       populate: {

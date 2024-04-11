@@ -69,11 +69,11 @@ const agentSchema = new mongoose.Schema({
       service: {
         type: String,
       },
-      direction: {
-        type: String,
-      },
+      // direction: {
+      //   type: String,
+      // },
       // service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
-      // direction:[{ type: mongoose.Schema.Types.ObjectId, ref:  "Direction" }],
+      direction:{ type: mongoose.Schema.Types.ObjectId, ref:  "Direction" },
       noteDebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
       account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 })

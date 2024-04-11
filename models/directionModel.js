@@ -12,7 +12,7 @@ const accountSchema = new mongoose.Schema({
     type: String,
     required: [true, "Renseignez une brève description"],
   },
-  directeur : { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+  directeur : { type: mongoose.Schema.Types.ObjectId, ref: "Agents" },
   services: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],
   account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 
