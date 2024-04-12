@@ -57,15 +57,19 @@ exports.getOneNd = async (req, res) => {
   }
   
 };
+
+
 exports.updateNd = async (req, res) => {
   try {
     const notedebit = await Notedebit.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
+    const updatedAt = notedebit.updatedAt;
     res.status(200).json({
-      statusstatus: "success",
+      status: "success",
       notedebit,
+      updatedAt: updatedAt
     });
   } catch (err) {
     res.status(400).json({

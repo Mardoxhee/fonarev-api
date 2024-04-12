@@ -11,8 +11,16 @@ const noteDebitSchema = new mongoose.Schema({
       },
   dateEncodage: {
         type: Date,
-
+    
       },
+
+  updatedAt: {
+    type: Date,
+  },
+
+  createdAt: {
+    type: Date,
+  },
   entite: {
     type: String,
 
