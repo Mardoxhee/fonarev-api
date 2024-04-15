@@ -1,5 +1,15 @@
 const Agent = require("../models/agentModel");
 const APIfeatures = require("./../utils/apiFeatures");
+const minio = require('minio');
+const minioClient = new minio.Client({
+  endPoint: '10.140.0.104',
+  port: 9001,
+  useSSL: false,
+  accessKey: 'LXXsFCFjx1h4ywfHhffu',
+  secretKey: '712R5F1RpK4E27Es0Y3ohgc6fWoTDXlTBD23wVf4',
+});
+
+const bucketName = 'fonarev';
 
 //Ici on a le controlleur de création d'un agent
 exports.createAgent = async (req, res) => {
@@ -61,9 +71,23 @@ exports.getOneAgent= async (req, res) => {
 
             exports.updateAgent = async (req, res) => {
                 try {
-                const agent = await Agent.findByIdAndUpdate(req.params.id, req.body, {
-                    new: true,
-                });
+                  let photoUrl;    
+                  if (req.file) {
+                    const fileStream = req.file.buffer;
+                    const metaData = {
+                      'Content-Type': req.file.mimetype,
+                    };
+                    await minioClient.putObject(buckefonarevtName, req.file.originalname, fileStream, metaData);
+                    photoUrl = `http://10.140.0.104:9001/${bucketName}/${req.file.originalname}`;
+                  }
+                  const agent = await Agent.findByIdAndUpdate(
+                    req.params.id,
+                    { ...req.body, photo: photoUrl }, // Inclure l'URL de la photo dans les données à mettre à jour
+                    { new: true }
+                  );
+                // const agent = await Agent.findByIdAndUpdate(req.params.id, req.body, {
+                //     new: true,
+                // });
                 res.status(200).json({
                     status: "Agent modifé avec succès !",
                     agent,
