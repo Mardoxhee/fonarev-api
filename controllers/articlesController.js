@@ -26,7 +26,6 @@ exports.getAllArticles = async (req, res) => {
       .filter()
       .sort()
       .limitFields()
-      .paginate();
     const article = await features.query;
     res.status(200).json({
       status: "Success",
