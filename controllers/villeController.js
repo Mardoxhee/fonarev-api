@@ -20,11 +20,11 @@ exports.createVille = async (req, res) => {
 
 exports.getAllVilles = async (req, res) => {
   try {
-    const features = new APIfeatures(Ville.find(), req.query).populate("province")
+    const features = new APIfeatures(Ville.find(), req.query)
       .filter()
       .sort()
       .limitFields()
-    const ville = await features.query;
+    const ville = await features.query.populate("province");
     res.status(200).json({
       status: "Success",
       numberOfVilles: ville.length,
