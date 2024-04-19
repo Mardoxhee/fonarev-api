@@ -20,7 +20,7 @@ exports.createVille = async (req, res) => {
 
 exports.getAllVilles = async (req, res) => {
   try {
-    const features = new APIfeatures(Ville.find(), req.query)
+    const features = new APIfeatures(Ville.find(), req.query).populate("province")
       .filter()
       .sort()
       .limitFields()
