@@ -40,7 +40,7 @@ exports.getAllVilles = async (req, res) => {
 
 exports.getOneVille = async (req, res) => {
   try {
-    const ville = await Ville.findById(req.params.id)
+    const ville = await Ville.findById(req.params.id).populate("province");
     res.status(200).json({
         status: "success",
         ville,

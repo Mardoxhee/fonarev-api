@@ -19,9 +19,7 @@ const agentSchema = new mongoose.Schema({
         type: String,
         // required: [true, "Renseignez le genre"],
       },  
-    province: {
-        type: String,
-      },
+
       nationalite: {
         type: String,
       },
@@ -73,6 +71,8 @@ const agentSchema = new mongoose.Schema({
       //   type: String,
       // },
       // service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
+
+      province:{ type: mongoose.Schema.Types.ObjectId, ref:  "Province" },
       direction:{ type: mongoose.Schema.Types.ObjectId, ref:  "Direction" },
       noteDebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
       account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
