@@ -70,7 +70,7 @@ exports.updateNd = async (req, res) => {
       new: true,
       runValidators: true,
     });
-    const updatedAt = notedebit.updatedAt;
+    const updatedAt = new Date();;
     res.status(200).json({
       status: "success",
       notedebit,
