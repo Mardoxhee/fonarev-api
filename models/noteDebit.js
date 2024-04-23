@@ -106,6 +106,9 @@ const noteDebitSchema = new mongoose.Schema({
   //   // required: [true, "Renseignez le numéro de la note de perception"],
   // },
   status: {
+    type: String,
+  },
+  status: {
     type: Number,
     default: 2, 
   },
