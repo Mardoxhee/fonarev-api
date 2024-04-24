@@ -16,7 +16,7 @@ const storiesRoutes = require("./routes/storiesRoutes")
 const categoryRoutes = require("./routes/categoryMineRoutes")
 const participantRouter = require("./routes/participantRoutes")
 const candidatureRouter = require("./routes/candidatureRoute")
-
+const notePerceptionRouter = require("./routes/notePerceptionRoutes")
 
 app.use(bp.json())
 var cors = require("cors");
@@ -55,6 +55,7 @@ app.use("/stories", cors(corsOptions), storiesRoutes);
 app.use("/categories-mine", cors(corsOptions), categoryRoutes);
 app.use("/participants", cors(corsOptions), participantRouter);
 app.use("/candidatures", cors(corsOptions), candidatureRouter);
+app.use("/notes-perception", cors(corsOptions), notePerceptionRouter);
 
 
 module.exports = app;

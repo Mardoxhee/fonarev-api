@@ -5,6 +5,7 @@ const crypto = require("crypto");
 
 const accountSchema = new mongoose.Schema({
   noteDebit: { type: mongoose.Schema.Types.ObjectId, ref: "NoteDebit" },
+  notePerception: { type: mongoose.Schema.Types.ObjectId, ref: "NotePerception" },
   lastName: {
     type: String,
     required: [true, "an account must have a lastName"],
