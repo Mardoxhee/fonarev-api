@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const perceptionSchema = new mongoose.Schema({
   numeroNp: {
     type: String,
-    required: [true, "Un service doit avoir un nom"],
+    required: [true, "Une note de perception doit avoir un nom"],
   },
   raisonSociale: {
     type: String,
