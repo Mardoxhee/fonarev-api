@@ -25,7 +25,12 @@ exports.getAllNp = async (req, res) => {
       .filter()
       .sort()
       .limitFields()
-    const notePerception = await features.query.populate('account').populate("noteDebits")
+    const notePerception = await features.query.populate('account').populate({
+      path: 'noteDebit', // Peupler 'produit'
+      populate: {
+        path: 'entrepriseMine', // Ensuite, peupler 'catégorie' dans 'produit'
+      },
+    });
     res.status(200).json({
       status: "Success",
       numberOfNotes: notePerception.length,
