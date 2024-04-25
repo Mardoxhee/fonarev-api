@@ -46,8 +46,12 @@ exports.getAllNp = async (req, res) => {
 
 exports.getOneNp = async (req, res) => {
   try {
-    const notePerception = await NotePerception.findById(req.params.id).populate('account').populate("noteDebits")
-   
+    const notePerception = await NotePerception.findById(req.params.id).populate('account').populate({
+      path: 'noteDebit', // Peupler 'produit'
+      populate: {
+        path: 'entrepriseMine', // Ensuite, peupler 'catégorie' dans 'produit'
+      },
+    });
     res.status(200).json({
         status: "success",
         notePerception,
