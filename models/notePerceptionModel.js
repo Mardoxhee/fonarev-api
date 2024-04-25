@@ -10,7 +10,9 @@ const perceptionSchema = new mongoose.Schema({
   },
   raisonSociale: {
     type: String,
-
+  },
+  montantNp : {
+    type: Number,
   },
   dateTaxation:{
     type : Date,
