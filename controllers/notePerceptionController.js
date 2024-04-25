@@ -26,7 +26,7 @@ exports.getAllNp = async (req, res) => {
       .sort()
       .limitFields()
     const notePerception = await features.query.populate('account').populate({
-      path: 'noteDebit', // Peupler 'produit'
+      path: 'noteDebits', // Peupler 'produit'
       populate: {
         path: 'entrepriseMine', // Ensuite, peupler 'catégorie' dans 'produit'
       },
@@ -47,7 +47,7 @@ exports.getAllNp = async (req, res) => {
 exports.getOneNp = async (req, res) => {
   try {
     const notePerception = await NotePerception.findById(req.params.id).populate('account').populate({
-      path: 'noteDebit', // Peupler 'produit'
+      path: 'noteDebits', // Peupler 'produit'
       populate: {
         path: 'entrepriseMine', // Ensuite, peupler 'catégorie' dans 'produit'
       },
