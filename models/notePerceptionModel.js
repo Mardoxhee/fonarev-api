@@ -23,7 +23,7 @@ const perceptionSchema = new mongoose.Schema({
   avis : {
     type : String,
   },
-  observation : {
+  url : {
     type : String,
   },
   account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
