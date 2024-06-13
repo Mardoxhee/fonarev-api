@@ -17,8 +17,8 @@ const accountSchema = new mongoose.Schema({
   phone: {
     type: String,
     unique: true,
-    required: [true, "An account has to have a phone number"],
-    validate: [validator.isMobilePhone, "Vérifiez que vous avez bien saisi le numéro de téléphone svp !"]
+    // required: [true, "An account has to have a phone number"],
+    // validate: [validator.isMobilePhone, "Vérifiez que vous avez bien saisi le numéro de téléphone svp !"]
   },
   email: {
     type: String,

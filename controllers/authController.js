@@ -44,39 +44,14 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email } = req.body;
 
-    // 1) check if email and password exist
+    // Générez un token en utilisant l'e-mail et le mot de passe reçus
+    const token = signToken({ email });
 
-    if (!email || !password) {
-      return res.status(400).json({
-        status: "failed",
-        message: "mention a email and a password",
-      });
-    }
-
-    const account = await Account.findOne({ email }).select("+password ");
-    if (
-      !account ||
-      !(await account.correctPassword(password, account.password))
-    ) {
-      return res
-        .status(401)
-        .json({ status: "failed", message: "incorrect mail or password" });
-    }
-    //console.log(account);
-
-    // 3) if every thing is ok, then send the token to the client and
-
-    const token = signToken(account._id);
-
+    // Répondre avec le token
     res.status(200).json({
       status: "connected to the platform",
-      accountId: account._id,
-      firstName:account.firstName,
-      lastName:account.lastName,
-      email : account.email,
-      role : account.role,
       token,
     });
   } catch (err) {
@@ -106,6 +81,7 @@ exports.protect = async (req, res, next) => {
         const newToken = jwt.sign(
           {
             user: decoded.user,
+
           },
           SECRET_KEY,
           {
