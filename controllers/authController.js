@@ -53,18 +53,8 @@ exports.login = async (req, res, next) => {
     }
 
 
-    const account = await Account.findOne({ email }).select("+password ");
-    if (
-      !account ||
-      !(await account.correctPassword(password, account.password))
-    ) {
-      return res
-        .status(401)
-        .json({ status: "failed", message: "incorrect mail or password" });
-    }
-    //console.log(account);
+    const account = await Account.findOne({ email })
 
-    // 3) if every thing is ok, then send the token to the client and
 
     const token = signToken(account._id);
 
