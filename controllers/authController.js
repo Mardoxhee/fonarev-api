@@ -45,13 +45,35 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res, next) => {
   try {
     const { email } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({
+        status: "failed",
+        message: "mention a email and a password",
+      });
+    }
 
-    // Générez un token en utilisant l'e-mail et le mot de passe reçus
-    const token = signToken({ email });
 
-    // Répondre avec le token
+    const account = await Account.findOne({ email }).select("+password ");
+    if (
+      !account ||
+      !(await account.correctPassword(password, account.password))
+    ) {
+      return res
+        .status(401)
+        .json({ status: "failed", message: "incorrect mail or password" });
+    }
+    //console.log(account);
+
+    // 3) if every thing is ok, then send the token to the client and
+
+    const token = signToken(account._id);
+
     res.status(200).json({
       status: "connected to the platform",
+      accountId: account._id,
+      firstName:account.firstName,
+      lastName:account.lastName,
+      email : account.email,
       token,
     });
   } catch (err) {
