@@ -14,7 +14,7 @@ const noteDebitSchema = new mongoose.Schema({
     
       },
 
-      updatedAt: {
+  updatedAt: {
     type: Date,
   },
 
@@ -107,6 +107,10 @@ const noteDebitSchema = new mongoose.Schema({
   // },
   url: {
     type: String,
+  },
+  isSubmitted : {
+    type: Boolean,
+    default: false,
   },
   status: {
     type: Number,
