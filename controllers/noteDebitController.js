@@ -26,7 +26,7 @@ exports.getAllNd = async (req, res) => {
       .filter()
       .sort()
       .limitFields()
-      .paginate();
+      // .paginate();
     const notedebit = await features.query.populate('account').populate('entrepriseMine').populate('province').populate('produit');
     res.status(200).json({
       status: "Success",
