@@ -114,7 +114,7 @@ const noteDebitSchema = new mongoose.Schema({
   },
   status: {
     type: Number,
-    default: 2, 
+    default: 3, 
   },
   tauxRed : {
     type: Number,
