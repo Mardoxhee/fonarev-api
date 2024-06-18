@@ -14,6 +14,10 @@ const accountSchema = new mongoose.Schema({
     type: String,
     required: [true, "an account must have a firstName"],
   },
+  isSupervisor : {
+    type: Boolean,
+    default: false,
+  },
   phone: {
     type: String,
     unique: true,
@@ -26,6 +30,7 @@ const accountSchema = new mongoose.Schema({
     required: [true, "An account must have a mail adress"],
     validate: [validator.isEmail, "Vérifiez que vous avez bien saisi l'adresse mail svp !'"]
   },
+
   role: {
     type: String,
     default: "admin",
