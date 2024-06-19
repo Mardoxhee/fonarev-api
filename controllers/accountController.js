@@ -20,7 +20,12 @@ exports.getAllAccounts = async (req, res) => {
 
 exports.getAccount = async (req, res) => {
   try {
-    const account = await Account.findById(req.params.id).populate('entrepriseMine')
+    const account = await Account.findById(req.params.id).populate({
+      path: 'entrepriseMine',
+      populate: {
+        path: 'province'
+      }
+    });
     res.status(200).json({
       status: "sucess",
         account,
