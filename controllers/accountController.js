@@ -1,9 +1,13 @@
 const Account = require("../models/accountModel");
+const APIfeatures = require("./../utils/apiFeatures");
 
 exports.getAllAccounts = async (req, res) => {
   try {
-    const accounts = await Account.find();
-
+    const features = new APIfeatures(Account.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    const accounts =  await features.query.populate('agentSuperviseur');
     // Send response
     res.status(200).json({
       status: "success",
