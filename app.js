@@ -56,6 +56,7 @@ app.use("/categories-mine", cors(corsOptions), categoryRoutes);
 app.use("/participants", cors(corsOptions), participantRouter);
 app.use("/candidatures", cors(corsOptions), candidatureRouter);
 app.use("/notes-perception", cors(corsOptions), notePerceptionRouter);
+app.use("/send)mail",cors(corsOptions), )
 
 
 module.exports = app;

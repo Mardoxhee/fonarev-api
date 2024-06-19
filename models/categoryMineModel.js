@@ -14,6 +14,7 @@ const categorySchema = new mongoose.Schema({
     type: String,
   },
   agents: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
+
 });
 
 // declaration du model

@@ -31,6 +31,7 @@ const entrepriseMineSchema = new mongoose.Schema({
   notedebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
   province: { type: mongoose.Schema.Types.ObjectId, ref: "Province" },
   account :{ type: mongoose.Schema.Types.ObjectId, ref: "Account" },
+  agentDeRecouvrement : { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 

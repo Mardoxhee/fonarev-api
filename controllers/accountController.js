@@ -20,7 +20,7 @@ exports.getAllAccounts = async (req, res) => {
 
 exports.getAccount = async (req, res) => {
   try {
-    const account = await Account.findById(req.params.id);
+    const account = await Account.findById(req.params.id).populate('entrepriseMine')
     res.status(200).json({
       status: "sucess",
         account,
@@ -32,14 +32,14 @@ exports.getAccount = async (req, res) => {
     });
   }
 };
+
 exports.updateAccount = async (req, res) => {
   try {
     const account = await Account.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidator: true,
     });
     res.status(200).json({
-      status: success,
+      status: "Le compte a été modifié avec succès",
       data: {
         account,
       },
