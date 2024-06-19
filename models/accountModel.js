@@ -42,10 +42,10 @@ const accountSchema = new mongoose.Schema({
     minlength: [10, "Le mot de passe doit avoir un minimum de 10 caractères "],
     select: false,
   },
-  entrepriseMine: {
+  entrepriseMine: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "EntrepriseMine",
-  },
+  }],
   agentSuperviseur : { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
   passwordConfirm: {
     type: String,
