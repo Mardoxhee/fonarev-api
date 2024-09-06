@@ -14,15 +14,14 @@ exports.createCandidature = async (req, res) => {
       to: ["tech_support@fonarev.cd", "dieudonne.wedi@fonarev.cd",  "rh@fonarev.cd"],
       subject: "Nouvelle candidature spontanée",
       html: `<p>Bonjour,</p>
-             <p>Nous avons reçu une nouvelle candidature depuis le site web :</p>
-             <p>Nom: ${newCandidature.nom}</p>
-             <p>Prénom: ${newCandidature.prenom}</p>
-             <p>Ville: ${newCandidature.ville}</p>
-             <p>Téléphone: ${newCandidature.phone}</p>
-             <p>E-mail: ${newCandidature.email}</p>
-             CV: <a href="${newCandidature.cv}">Télécharger le CV</a>
-             Lettre de motivation: <a href="${newCandidature.lm}">Télécharger la lettre de motivation</a>
-             <p>Cordialement,</p>`,
+          <p>Nous avons reçu une nouvelle candidature via le site web :</p>
+          <p><strong>Nom :</strong> ${newCandidature.nom}</p>
+          <p><strong>Prénom :</strong> ${newCandidature.prenom}</p>
+          <p><strong>Ville :</strong> ${newCandidature.ville}</p>
+          <p><strong>Téléphone :</strong> ${newCandidature.phone}</p>
+          <p><strong>E-mail :</strong> ${newCandidature.email}</p>
+          <p>Vous trouverez les autres détails de la candidature sur la plateforme de gestion des ressources humaines.</p>
+          <p>Cordialement,</p>`,
     });
     res.status(201).json({
       status: "candidature created successfully",
