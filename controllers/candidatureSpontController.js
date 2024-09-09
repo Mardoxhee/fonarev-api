@@ -42,7 +42,7 @@ exports.getAllCandidatures = async (req, res) => {
       .filter()
       .sort()
       .limitFields()
-      // .paginate();
+      .paginate();
     const candidatures = await features.query;
 
     res.status(200).json({
