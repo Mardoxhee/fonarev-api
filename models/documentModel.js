@@ -5,8 +5,14 @@ const documentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  createdAt: {
+    type: Date,
+  },
+  updatedAt: {
+    type: Date,
+  },
   description: String,
-  file: String, 
+  url: String, 
   account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 

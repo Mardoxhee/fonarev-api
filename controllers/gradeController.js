@@ -1,15 +1,15 @@
-const Document = require("./../models/documentModel");
+const Grade = require("./../models/gradeModel");
 const APIfeatures = require("./../utils/apiFeatures");
 
-exports.createDocument = async (req, res) => {
+exports.createGrade = async (req, res) => {
   try {
     const bodies = req.body;
     bodies.account = req.decoded.id;
     bodies.createdAt = new Date;
-    const newDocument = await Document.create(bodies);
+    const newGrade = await Grade.create(bodies);
     res.status(201).json({
-      status: "document created successfully",
-      newDocument,
+      status: "Grade created successfully",
+      newGrade,
     });
   } catch (err) {
     res.status(400).json({
@@ -20,19 +20,19 @@ exports.createDocument = async (req, res) => {
   }
 };
 
-exports.getAllDocuments = async (req, res) => {
+exports.getAllGrades = async (req, res) => {
   try {
-    const features = new APIfeatures(Document.find(), req.query)
+    const features = new APIfeatures(Grade.find(), req.query)
       .filter()
       .sort()
       .limitFields()
       // .paginate();
-    const document = await features.query.populate('account');
+    const grade = await features.query.populate('account');
 
     res.status(200).json({
       status: "Success",
-      numberOfDocuments: document.length,
-      document,
+      numberOfGrades: grade.length,
+      grade,
     });
   } catch (err) {
     res.status(400).json({
@@ -42,13 +42,13 @@ exports.getAllDocuments = async (req, res) => {
   }
 };
 
-exports.getOneDocument = async (req, res) => {
+exports.getOneGrade = async (req, res) => {
   try {
-    const document = await Document.findById(req.params.id)
+    const grade = await Grade.findById(req.params.id)
     .populate("account");
     res.status(200).json({
         status: "success",
-        document,
+        grade,
       });
   } catch (err) {
     res.status(400).json({
@@ -58,15 +58,16 @@ exports.getOneDocument = async (req, res) => {
   }
   
 };
-exports.updateDocument = async (req, res) => {
+exports.updateGrade = async (req, res) => {
   try {
-    const document = await Document.findByIdAndUpdate(req.params.id, req.body, {
+    const grade = await Grade.findByIdAndUpdate(req.params.id, req.body, {
+
       new: true,
       runValidators: true,
     });
     res.status(200).json({
       statusstatus: "success",
-      document,
+      grade,
     });
   } catch (err) {
     res.status(400).json({
@@ -76,11 +77,11 @@ exports.updateDocument = async (req, res) => {
   }
 };
 
-exports.deleteDocument = async (req, res) => {
+exports.deleteGrade = async (req, res) => {
   try {
-    await Document.findByIdAndDelete(req.params.id);
+    await Grade.findByIdAndDelete(req.params.id);
     res.status(200).json({
-      status: "Document deleted successfully",
+      status: "Grade deleted successfully",
       data: null,
     });
   } catch (err) {

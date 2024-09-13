@@ -1,15 +1,15 @@
-const Document = require("./../models/documentModel");
+const Personne = require("./../models/personnesEnCharge");
 const APIfeatures = require("./../utils/apiFeatures");
 
-exports.createDocument = async (req, res) => {
+exports.createPerson = async (req, res) => {
   try {
     const bodies = req.body;
     bodies.account = req.decoded.id;
     bodies.createdAt = new Date;
-    const newDocument = await Document.create(bodies);
+    const newPerson = await Personne.create(bodies);
     res.status(201).json({
-      status: "document created successfully",
-      newDocument,
+      status: "personne created successfully",
+      newPerson,
     });
   } catch (err) {
     res.status(400).json({
@@ -20,19 +20,19 @@ exports.createDocument = async (req, res) => {
   }
 };
 
-exports.getAllDocuments = async (req, res) => {
+exports.getAllPersons = async (req, res) => {
   try {
-    const features = new APIfeatures(Document.find(), req.query)
+    const features = new APIfeatures(Personne.find(), req.query)
       .filter()
       .sort()
       .limitFields()
       // .paginate();
-    const document = await features.query.populate('account');
+    const personne = await features.query.populate('account');
 
     res.status(200).json({
       status: "Success",
-      numberOfDocuments: document.length,
-      document,
+      numberOfPersonnes: personne.length,
+      personne,
     });
   } catch (err) {
     res.status(400).json({
@@ -42,13 +42,13 @@ exports.getAllDocuments = async (req, res) => {
   }
 };
 
-exports.getOneDocument = async (req, res) => {
+exports.getOnePerson = async (req, res) => {
   try {
-    const document = await Document.findById(req.params.id)
+    const personne = await Personne.findById(req.params.id)
     .populate("account");
     res.status(200).json({
         status: "success",
-        document,
+        personne,
       });
   } catch (err) {
     res.status(400).json({
@@ -58,15 +58,15 @@ exports.getOneDocument = async (req, res) => {
   }
   
 };
-exports.updateDocument = async (req, res) => {
+exports.updatePerson = async (req, res) => {
   try {
-    const document = await Document.findByIdAndUpdate(req.params.id, req.body, {
+    const personne = await Personne.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
     res.status(200).json({
       statusstatus: "success",
-      document,
+      personne,
     });
   } catch (err) {
     res.status(400).json({
@@ -76,11 +76,11 @@ exports.updateDocument = async (req, res) => {
   }
 };
 
-exports.deleteDocument = async (req, res) => {
+exports.deletePerson = async (req, res) => {
   try {
-    await Document.findByIdAndDelete(req.params.id);
+    await Personne.findByIdAndDelete(req.params.id);
     res.status(200).json({
-      status: "Document deleted successfully",
+      status: "Personne deleted successfully",
       data: null,
     });
   } catch (err) {
