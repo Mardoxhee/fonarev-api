@@ -35,11 +35,7 @@ const personneEnchargeSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
   },
-  salaire: Number,
-  perdiem: Number, 
-  autre: String, 
-  conge: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
-  
+  agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
 });
 
 const PersonneAcharge = mongoose.model("PersonneAcharge", personneEnchargeSchema);

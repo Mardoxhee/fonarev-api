@@ -61,6 +61,7 @@ app.use("/candidatures", cors(corsOptions), candidatureRouter);
 app.use("/notes-perception", cors(corsOptions), notePerceptionRouter);
 app.use("/documents", cors(corsOptions),DocumentRouter);
 app.use("/grades", cors(corsOptions),gradeRouter);
+app.use("/personnes", cors(corsOptions),personneRouter);
 
 
 
