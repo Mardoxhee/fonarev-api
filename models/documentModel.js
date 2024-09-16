@@ -14,6 +14,7 @@ const documentSchema = new mongoose.Schema({
   description: String,
   url: String, 
   account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
+  agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
 });
 
 const Document = mongoose.model("Document", documentSchema);

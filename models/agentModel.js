@@ -71,7 +71,7 @@ const agentSchema = new mongoose.Schema({
       //   type: String,
       // },
       // service: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
-
+      documents:[{ type: mongoose.Schema.Types.ObjectId, ref:  "Document" }],
       province:{ type: mongoose.Schema.Types.ObjectId, ref:  "Province" },
       direction:{ type: mongoose.Schema.Types.ObjectId, ref:  "Direction" },
       noteDebit: [{ type: mongoose.Schema.Types.ObjectId, ref: "Notedebit" }],
