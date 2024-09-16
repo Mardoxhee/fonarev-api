@@ -27,7 +27,7 @@ exports.getAllPersons = async (req, res) => {
       .sort()
       .limitFields()
       // .paginate();
-    const personne = await features.query.populate('account');
+    const personne = await features.query
 
     res.status(200).json({
       status: "Success",
@@ -45,7 +45,7 @@ exports.getAllPersons = async (req, res) => {
 exports.getOnePerson = async (req, res) => {
   try {
     const personne = await Personne.findById(req.params.id)
-    .populate("account");
+    // .populate("account");
     res.status(200).json({
         status: "success",
         personne,
