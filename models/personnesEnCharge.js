@@ -36,6 +36,7 @@ const personneEnchargeSchema = new mongoose.Schema({
     type: Date,
   },
   agent: { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 
 const PersonneAcharge = mongoose.model("PersonneAcharge", personneEnchargeSchema);
