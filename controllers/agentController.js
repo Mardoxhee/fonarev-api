@@ -57,6 +57,42 @@ exports.getOneAgent= async (req, res) => {
           });
         }
       };
+
+
+
+      exports.getAgentByMatricule = async (req, res) => {
+        try {
+          // Recherche de l'agent par son matricule
+          const agent = await Agent.findOne({ matricule: req.params.matricule });
+      
+          if (!agent) {
+            return res.status(404).json({
+              status: "failed",
+              message: "Aucun agent trouvé avec ce matricule.",
+            });
+          }
+      
+          // Ne retourner que les champs spécifiques
+          const { noms, matricule, grade, fonction, photo } = agent;
+      
+          res.status(200).json({
+            status: "success",
+            data: {
+              noms,
+              matricule,
+              grade,
+              fonction,
+              photo,
+            },
+          });
+        } catch (err) {
+          res.status(400).json({
+            status: "failed",
+            message: err.message,
+          });
+        }
+      };
+      
 //Le controlleur de mise à jour d'un agent
 
             exports.updateAgent = async (req, res) => {
