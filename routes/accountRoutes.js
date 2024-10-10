@@ -19,7 +19,7 @@ router.post("/signup", signup);
 router.post("/login", login);
 router.post("/forgotPassword", forgotPassword);
 router.route("/").get(getAllAccounts);
-router.patch("/resetPassword/:token", resetPassword);
+router.patch("/resetPassword/", resetPassword);
 router.route("/:id").get(getAccount).patch(updateAccount).delete(deleteAccount);
 
 module.exports = router;
