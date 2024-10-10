@@ -146,39 +146,99 @@ exports.protect = async (req, res, next) => {
 //   };
 // };
 
-exports.forgotPassword = async (req, res, next) => {
-  // 1) get Account based on posted email
+// exports.forgotPassword = async (req, res, next) => {
+//   // 1) get Account based on posted email
 
-  const account = await Account.findOne({ email: req.body.email });
-  if (!account) {
-    return res
-      .status(404)
-      .json({ messagestatus: "failed", message: "no account with this email" });
-  }
+//   const account = await Account.findOne({ email: req.body.email });
+//   if (!account) {
+//     return res
+//       .status(404)
+//       .json({ messagestatus: "failed", message: "no account with this email" });
+//   }
 
-  // 2) generate the random token for t
+//   // 2) generate the random token for t
 
-  const resetToken = account.createPasswordResetToken();
-  await account.save({ validateBeforeSave: false });
-  // Send it to account's email address
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/accounts/resetPassword/${resetToken}`;
-  const message = `forgot your password? submit a PATCH request to your new password and passwordConfirm to : ${resetURL}.\n if you didn't forget it, plz ignore this message`;
+//   const resetToken = account.createPasswordResetToken();
+//   await account.save({ validateBeforeSave: false });
+//   // Send it to account's email address
+//   const resetURL = `${req.protocol}://${req.get(
+//     "host"
+//   )}/api/accounts/resetPassword/${resetToken}`;
+//   const message = `forgot your password? submit a PATCH request to your new password and passwordConfirm to : ${resetURL}.\n if you didn't forget it, plz ignore this message`;
+//   try {
+//     await sendMail({
+//       email: account.email,
+//       subject: "your password reset token (valid for 10minutes)",
+//       message,
+//     });
+//     res.status(200).json({ status: "success", message: "token sent to mail" });
+//   } catch (err) {
+//     Account.passwordResetToken = undefined;
+//     Account.passwordResetExpires = undefined;
+//     await account.save({ validateBeforeSave: false });
+//     return res
+//       .status(500)
+//       .json({ status: "failed", message: "error while sending email" });
+//   }
+// };
+
+
+// Fonction de changement de mot de passe
+exports.forgotPassword = async (req, res) => {
   try {
-    await sendEMail({
-      email: account.email,
-      subject: "your password reset token (valid for 10minutes)",
-      message,
+    const { oldPassword, newPassword, newPasswordConfirm } = req.body;
+
+    // Vérifier que les champs requis sont présents
+    if (!oldPassword || !newPassword || !newPasswordConfirm) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Vous devez fournir l'ancien mot de passe et le nouveau mot de passe",
+      });
+    }
+
+    // 1) Obtenir l'utilisateur actuellement connecté (basé sur l'ID JWT)
+    const account = await Account.findById(req.decoded.id).select("+password");
+
+    if (!account) {
+      return res.status(401).json({
+        status: "failed",
+        message: "Utilisateur non trouvé",
+      });
+    }
+
+    // 2) Vérifier si l'ancien mot de passe est correct
+    if (!(await account.correctPassword(oldPassword, account.password))) {
+      return res.status(401).json({
+        status: "failed",
+        message: "L'ancien mot de passe est incorrect",
+      });
+    }
+
+    // 3) Vérifier que les nouveaux mots de passe correspondent
+    if (newPassword !== newPasswordConfirm) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Les nouveaux mots de passe ne correspondent pas",
+      });
+    }
+
+    // 4) Si tout est correct, mettre à jour le mot de passe
+    account.password = newPassword;
+    account.passwordConfirm = newPasswordConfirm;
+    await account.save();
+
+    // 5) Générer un nouveau token et le renvoyer
+    const token = signToken(account._id);
+    res.status(200).json({
+      status: "success",
+      message: "Mot de passe changé avec succès",
+      token,
     });
-    res.status(200).json({ status: "success", message: "token sent to mail" });
   } catch (err) {
-    Account.passwordResetToken = undefined;
-    Account.passwordResetExpires = undefined;
-    await account.save({ validateBeforeSave: false });
-    return res
-      .status(500)
-      .json({ status: "failed", message: "error while sending email" });
+    res.status(400).json({
+      status: "failed",
+      message: err.message,
+    });
   }
 };
 
