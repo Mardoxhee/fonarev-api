@@ -23,9 +23,9 @@ exports.createArticle = async (req, res) => {
 exports.getAllArticles = async (req, res) => {
   try {
     const features = new APIfeatures(Article.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
+      // .filter()
+      // .sort()
+      // .limitFields()
     const article = await features.query;
     res.status(200).json({
       status: "Success",
