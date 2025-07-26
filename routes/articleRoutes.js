@@ -8,10 +8,11 @@ const {
     getOneArticle,
     updateArticle,
     deleteArticle,
-
+    getLastArticles
   } = require("../controllers/articlesController");
 
   router.route("/").get(getAllArticles).post(protect, createArticle);
+  router.get("/last", getLastArticles);
   router
   .route("/:id")
   .get(getOneArticle)

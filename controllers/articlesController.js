@@ -87,3 +87,19 @@ exports.deleteArticle = async (req, res) => {
     });
   }
 };
+
+// Nouvelle méthode pour les 5 derniers articles
+exports.getLastArticles = async (req, res) => {
+  try {
+    const articles = await Article.find().sort({ date: -1 }).limit(5);
+    res.status(200).json({
+      status: "Success",
+      articles,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "failed",
+      message: err.message,
+    });
+  }
+};
