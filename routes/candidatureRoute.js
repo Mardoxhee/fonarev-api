@@ -11,12 +11,13 @@ const {
 
   } = require("../controllers/candidatureSpontController");
 
-  router.route("/").get(getAllCandidatures).post(createCandidature);
+  router.route("/").get(protect, getAllCandidatures).post(createCandidature);
+  router.get("/admin/all", protect, getAllCandidatures);
   router
   .route("/:id")
-  .get(getOneCandidature)
-  .patch(updateCandidature)
-  .delete(deleteCandidature);
+  .get(protect, getOneCandidature)
+  .patch(protect, updateCandidature)
+  .delete(protect, deleteCandidature);
 
 
 module.exports = router;

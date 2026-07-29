@@ -2,30 +2,72 @@ const CandidatureSpont = require("./../models/candidatureSpont");
 const APIfeatures = require("./../utils/apiFeatures");
 const sendMail = require('./../utils/email');
 
-exports.createCandidature = async (req, res) => {
+const normalizeCandidaturePayload = (body) => {
+  const payload = { ...body };
+
+  if (!payload.nom && payload.personalInfo?.lastName) payload.nom = payload.personalInfo.lastName;
+  if (!payload.prenom && payload.personalInfo?.firstName) payload.prenom = payload.personalInfo.firstName;
+  if (!payload.email && payload.personalInfo?.email) payload.email = payload.personalInfo.email;
+  if (!payload.phone && payload.personalInfo?.phone) payload.phone = payload.personalInfo.phone;
+  if (!payload.cv && Array.isArray(payload.documents)) {
+    const cv = payload.documents.find((doc) => doc.type === "cv");
+    if (cv) payload.cv = cv.url;
+  }
+  if (!payload.lm && Array.isArray(payload.documents)) {
+    const lm = payload.documents.find((doc) => doc.type === "lettre_motivation");
+    if (lm) payload.lm = lm.url;
+  }
+
+  payload.date = payload.date || new Date();
+  return payload;
+};
+
+const notifyCandidature = async (candidature) => {
+  const warnings = [];
+
   try {
-    const newCandidature = await CandidatureSpont.create(req.body);
     await sendMail({
-      to: newCandidature.email, // Utiliser newParticipant au lieu de newAccount
-      subject: "Candidature spontanée",
-      html: "<p>Merci de nous avoir soumis votre candidature. Nous allons l'examiner et vous serez notifié à l'issue du traitement.<br>Cordialement,</p>",
+      to: candidature.email,
+      subject: "Candidature FONAREV",
+      html: "<p>Merci de nous avoir soumis votre candidature. Nous allons l'examiner et vous serez notifie a l'issue du traitement.<br>Cordialement,</p>",
     });
+  } catch (err) {
+    warnings.push("Email candidat non envoye");
+  }
+
+  try {
     await sendMail({
-      to: ["tech_support@fonarev.cd",  "rh@fonarev.cd"],
-      subject: "Nouvelle candidature spontanée",
+      to: ["tech_support@fonarev.cd", "rh@fonarev.cd"],
+      subject: "Nouvelle candidature FONAREV",
       html: `<p>Bonjour,</p>
-          <p>Nous avons reçu une nouvelle candidature via le site web :</p>
-          <p><strong>Nom :</strong> ${newCandidature.nom}</p>
-          <p><strong>Prénom :</strong> ${newCandidature.prenom}</p>
-          <p><strong>Ville :</strong> ${newCandidature.ville}</p>
-          <p><strong>Téléphone :</strong> ${newCandidature.phone}</p>
-          <p><strong>E-mail :</strong> ${newCandidature.email}</p>
-          <p>Vous trouverez les autres détails de la candidature sur la plateforme de gestion des ressources humaines.</p>
+          <p>Nous avons recu une nouvelle candidature via le site web :</p>
+          <p><strong>Nom :</strong> ${candidature.nom}</p>
+          <p><strong>Prenom :</strong> ${candidature.prenom}</p>
+          <p><strong>Ville :</strong> ${candidature.ville || "-"}</p>
+          <p><strong>Telephone :</strong> ${candidature.phone}</p>
+          <p><strong>E-mail :</strong> ${candidature.email}</p>
+          <p><strong>Type :</strong> ${candidature.typeCandidature}</p>
+          <p>Les autres details sont disponibles dans la plateforme RH.</p>
           <p>Cordialement,</p>`,
     });
+  } catch (err) {
+    warnings.push("Email RH non envoye");
+  }
+
+  return warnings;
+};
+
+exports.createCandidature = async (req, res) => {
+  try {
+    const payload = normalizeCandidaturePayload(req.body);
+    const newCandidature = await CandidatureSpont.create(payload);
+    const warnings = await notifyCandidature(newCandidature);
+
     res.status(201).json({
-      status: "candidature created successfully",
+      status: "success",
+      message: "Candidature soumise avec succes",
       newCandidature,
+      warnings,
     });
   } catch (err) {
     res.status(400).json({
@@ -61,6 +103,8 @@ exports.getAllCandidatures = async (req, res) => {
 exports.getOneCandidature = async (req, res) => {
   try {
     const candidature = await CandidatureSpont.findById(req.params.id)
+      .populate("offreEmploi")
+      .populate("formulaire")
     res.status(200).json({
         status: "success",
         candidature,
@@ -78,7 +122,7 @@ exports.updateCandidature = async (req, res) => {
     const candidature = await CandidatureSpont.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
-    });
+    }).populate("offreEmploi").populate("formulaire");
     res.status(200).json({
       status: "success",
       candidature,

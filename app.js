@@ -20,6 +20,10 @@ const notePerceptionRouter = require("./routes/notePerceptionRoutes")
 const DocumentRouter = require("./routes/documentRoute")
 const gradeRouter = require("./routes/gradeRoutes")
 const personneRouter = require("./routes/personneAchargeRoutes")
+const marcheRouter = require("./routes/marcheRoutes")
+const offreEmploiRouter = require("./routes/offreEmploiRoutes")
+const newsletterRouter = require("./routes/newsletterRoutes")
+const applicationFormRouter = require("./routes/applicationFormRoutes")
 
 app.use(bp.json())
 var cors = require("cors");
@@ -62,6 +66,10 @@ app.use("/notes-perception", cors(corsOptions), notePerceptionRouter);
 app.use("/documents", cors(corsOptions),DocumentRouter);
 app.use("/grades", cors(corsOptions),gradeRouter);
 app.use("/personnes", cors(corsOptions),personneRouter);
+app.use("/marches", cors(corsOptions), marcheRouter);
+app.use("/offres-emploi", cors(corsOptions), offreEmploiRouter);
+app.use("/newsletters", cors(corsOptions), newsletterRouter);
+app.use("/formulaires", cors(corsOptions), applicationFormRouter);
 
 
 
