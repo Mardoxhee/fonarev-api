@@ -16,8 +16,8 @@ const {
   router
   .route("/:id")
   .get(getOneDirection)
-  .patch(updateDirection)
-  .delete(deleteDirection);
+  .patch(protect, updateDirection)
+  .delete(protect, deleteDirection);
 
 
 module.exports = router;

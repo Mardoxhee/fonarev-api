@@ -1,7 +1,4 @@
 const mongoose = require("mongoose");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
 
 const serviceSchema = new mongoose.Schema({
   denomination: {
@@ -12,8 +9,9 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     required: [true, "Rajoutez une brève desription pour ce service"],
   },
-  responsable : { type: mongoose.Schema.Types.ObjectId, ref: "Agent" },
+  responsable : { type: mongoose.Schema.Types.ObjectId, ref: "Agents" },
   direction: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
+  division: { type: mongoose.Schema.Types.ObjectId, ref: "Division" },
   account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
 });
 

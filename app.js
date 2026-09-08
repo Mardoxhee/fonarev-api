@@ -6,6 +6,7 @@ const AccountRouter = require("./routes/accountRoutes");
 const AgentRouter = require("./routes/agentRoutes");
 const DirectionRouter = require("./routes/directionRoutes");
 const ServiceRouter = require("./routes/serviceRoutes");
+const DivisionRouter = require("./routes/divisionRoutes");
 const entrepriseMineRouter = require("./routes/entrepriseMineRoutes")
 const noteDebitRouter = require("./routes/noteDebitRoutes")
 const produitsRouter = require("./routes/produitsMine")
@@ -62,6 +63,7 @@ app.use("/agents", cors(corsOptions), AgentRouter);
 app.use("/accounts", cors(corsOptions), AccountRouter);
 app.use("/directions", cors(corsOptions), DirectionRouter);
 app.use("/services", cors(corsOptions), ServiceRouter);
+app.use("/divisions", cors(corsOptions), DivisionRouter);
 app.use("/entrepriseminieres", cors(corsOptions), entrepriseMineRouter);
 app.use("/notededebit", cors(corsOptions), noteDebitRouter);
 app.use("/produits-miniers", cors(corsOptions), produitsRouter);

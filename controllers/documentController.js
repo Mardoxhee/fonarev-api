@@ -4,97 +4,6 @@ const DocumentType = require("./../models/documentTypeModel");
 const Agent = require("../models/agentModel");
 const APIfeatures = require("./../utils/apiFeatures");
 
-const DEFAULT_DOCUMENT_TYPES = [
-  {
-    name: "Diplôme",
-    code: "DIPLOME",
-    category: "formation",
-    description: "Diplôme ou titre académique principal de l'agent.",
-    required: true,
-    condition: { field: "always", operator: "exists" },
-    acceptedFormats: ["pdf", "image"],
-    visibility: "rh",
-    sortOrder: 10,
-  },
-  {
-    name: "Pièce d'identité",
-    code: "PIECE_IDENTITE",
-    category: "identite",
-    description: "Carte d'identité, passeport ou pièce officielle équivalente.",
-    required: true,
-    condition: { field: "always", operator: "exists" },
-    acceptedFormats: ["pdf", "image"],
-    visibility: "rh",
-    sortOrder: 20,
-  },
-  {
-    name: "CV",
-    code: "CV",
-    category: "carriere",
-    description: "Curriculum vitae actualisé.",
-    required: true,
-    condition: { field: "always", operator: "exists" },
-    acceptedFormats: ["pdf"],
-    visibility: "rh",
-    sortOrder: 30,
-  },
-  {
-    name: "Contrat signé",
-    code: "CONTRAT_SIGNE",
-    category: "contrat",
-    description: "Contrat de travail ou acte d'engagement signé.",
-    required: true,
-    condition: { field: "always", operator: "exists" },
-    acceptedFormats: ["pdf"],
-    visibility: "rh",
-    sortOrder: 40,
-  },
-  {
-    name: "Acte de mariage",
-    code: "ACTE_MARIAGE",
-    category: "famille",
-    description: "Document requis pour les agents mariés.",
-    required: true,
-    condition: { field: "etatcivile", operator: "contains", value: "mari" },
-    acceptedFormats: ["pdf", "image"],
-    visibility: "rh",
-    sortOrder: 50,
-  },
-  {
-    name: "Acte de naissance enfant",
-    code: "ACTE_NAISSANCE_ENFANT",
-    category: "famille",
-    description: "Document requis lorsqu'un agent déclare au moins un enfant.",
-    required: true,
-    condition: { field: "nombrenfants", operator: "greaterThan", value: "0" },
-    acceptedFormats: ["pdf", "image"],
-    visibility: "rh",
-    sortOrder: 60,
-  },
-  {
-    name: "Permis de conduire",
-    code: "PERMIS_CONDUIRE",
-    category: "carriere",
-    description: "Document requis pour les fonctions de chauffeur.",
-    required: true,
-    condition: { field: "fonction", operator: "contains", value: "chauffeur" },
-    acceptedFormats: ["pdf", "image"],
-    visibility: "rh",
-    sortOrder: 70,
-  },
-  {
-    name: "Certificat médical",
-    code: "CERTIFICAT_MEDICAL",
-    category: "medical",
-    description: "Pièce médicale à accès restreint.",
-    required: false,
-    condition: { field: "always", operator: "exists" },
-    acceptedFormats: ["pdf", "image"],
-    visibility: "medical",
-    sortOrder: 80,
-  },
-];
-
 const normalizeText = (value) =>
   String(value || "")
     .normalize("NFD")
@@ -142,12 +51,6 @@ const documentMatchesType = (document, documentType) => {
 
   const documentTypeName = normalizeText(document.type);
   return documentTypeName === normalizeText(documentType.code) || documentTypeName === normalizeText(documentType.name);
-};
-
-const ensureDefaultDocumentTypes = async () => {
-  const count = await DocumentType.countDocuments();
-  if (count > 0) return;
-  await DocumentType.insertMany(DEFAULT_DOCUMENT_TYPES);
 };
 
 const buildDossierChecklist = (agent, documentTypes, documents) => {
@@ -289,7 +192,6 @@ exports.deleteDocument = async (req, res) => {
 
 exports.getDocumentTypes = async (req, res) => {
   try {
-    await ensureDefaultDocumentTypes();
     const documentTypes = await DocumentType.find(req.query.active === "false" ? {} : { active: { $ne: false } }).sort("sortOrder name");
 
     res.status(200).json({
@@ -385,8 +287,6 @@ exports.getAgentDocuments = async (req, res) => {
 
 exports.getAgentDossier = async (req, res) => {
   try {
-    await ensureDefaultDocumentTypes();
-
     if (!mongoose.Types.ObjectId.isValid(req.params.agentId)) {
       return res.status(400).json({
         status: "failed",

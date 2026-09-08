@@ -47,7 +47,7 @@ exports.createAgent = async (req, res) => {
       .sort()
       .limitFields()
       .paginate();
-      const agents = await features.query.populate('direction').populate('account').populate("province");
+      const agents = await features.query.populate('direction').populate('division').populate('account').populate("province");
       const parsedCountQuery = JSON.parse(countQueryString);
       const [totalAgents, totalFemmes, totalHommes] = await Promise.all([
         Agent.countDocuments(parsedCountQuery),
@@ -80,6 +80,7 @@ exports.getOneAgent= async (req, res) => {
         try {
           const agent = await Agent.findById(req.params.id)
             .populate('direction')
+            .populate('division')
             .populate('province')
             .populate({ path: 'documents', populate: { path: 'documentType' } })
             .populate('personnesAcharges')
