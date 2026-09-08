@@ -48,11 +48,22 @@ exports.createAgent = async (req, res) => {
       .limitFields()
       .paginate();
       const agents = await features.query.populate('direction').populate('account').populate("province");
-      const totalAgents = await Agent.countDocuments(JSON.parse(countQueryString));
+      const parsedCountQuery = JSON.parse(countQueryString);
+      const [totalAgents, totalFemmes, totalHommes] = await Promise.all([
+        Agent.countDocuments(parsedCountQuery),
+        Agent.countDocuments({ ...parsedCountQuery, sexe: "F" }),
+        Agent.countDocuments({ ...parsedCountQuery, sexe: "M" }),
+      ]);
       res.status(200).json({
         status: "Success",
         numberOfAgents: agents.length,
         totalAgents,
+        totalFemmes,
+        totalHommes,
+        genderTotals: {
+          femmes: totalFemmes,
+          hommes: totalHommes,
+        },
         page: req.query.page * 1 || 1,
         limit: req.query.limit * 1 || 20,
         agents: agents
