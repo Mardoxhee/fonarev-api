@@ -1,10 +1,19 @@
 const Agent = require("../models/agentModel");
 const APIfeatures = require("./../utils/apiFeatures");
 
+const normalizeAgentPayload = (payload) => {
+  const body = { ...payload };
+  if (body.etatCivil !== undefined && body.etatcivile === undefined) body.etatcivile = body.etatCivil;
+  if (body.nombreEnfants !== undefined && body.nombrenfants === undefined) body.nombrenfants = body.nombreEnfants;
+  delete body.etatCivil;
+  delete body.nombreEnfants;
+  return body;
+};
+
 //Ici on a le controlleur de création d'un agent
 exports.createAgent = async (req, res) => {
   try {
-    const newAgent = await Agent.create(req.body);
+    const newAgent = await Agent.create(normalizeAgentPayload(req.body));
     res.status(201).json({
       status: "Agent enregistré avec succès !",
       newAgent,
@@ -20,19 +29,32 @@ exports.createAgent = async (req, res) => {
         error: `Le contenu du champ  ${conflictKey} Existe déjà. Veuillez saisir des valeurs uniques.`,
       });
     }
+
+    return res.status(400).json({
+      status: "failed",
+      message: error.message,
+    });
+  }
 };
-}
   //Le controlleur d'affichage de tous les agents
   exports.getAgents = async (req, res) => {
     try {
+      const countQuery = { ...req.query };
+      ["page", "limit", "sort", "fields"].forEach((field) => delete countQuery[field]);
+      const countQueryString = JSON.stringify(countQuery).replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
       const features = new APIfeatures(Agent.find(), req.query)
       .filter()
       .sort()
       .limitFields()
+      .paginate();
       const agents = await features.query.populate('direction').populate('account').populate("province");
+      const totalAgents = await Agent.countDocuments(JSON.parse(countQueryString));
       res.status(200).json({
         status: "Success",
         numberOfAgents: agents.length,
+        totalAgents,
+        page: req.query.page * 1 || 1,
+        limit: req.query.limit * 1 || 20,
         agents: agents
       });
     } catch (err) {
@@ -45,7 +67,11 @@ exports.createAgent = async (req, res) => {
  //Le controlleur d'affichage d'un agent à la fois
 exports.getOneAgent= async (req, res) => {
         try {
-          const agent = await Agent.findById(req.params.id).populate('direction').populate('documents').populate('personnesAcharges')
+          const agent = await Agent.findById(req.params.id)
+            .populate('direction')
+            .populate('province')
+            .populate({ path: 'documents', populate: { path: 'documentType' } })
+            .populate('personnesAcharges')
           res.status(200).json({
             status: "success",
             agent,
@@ -97,7 +123,7 @@ exports.getOneAgent= async (req, res) => {
 
             exports.updateAgent = async (req, res) => {
                 try {
-                const agent = await Agent.findByIdAndUpdate(req.params.id, req.body, {
+                const agent = await Agent.findByIdAndUpdate(req.params.id, normalizeAgentPayload(req.body), {
                     new: true,
                 });
                 res.status(200).json({

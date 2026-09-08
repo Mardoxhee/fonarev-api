@@ -23,6 +23,9 @@ const agentSchema = new mongoose.Schema({
       nationalite: {
         type: String,
       },
+      adresse: {
+        type: String,
+      },
       provinceOrigin: {
         type: String,
       },
@@ -60,6 +63,17 @@ const agentSchema = new mongoose.Schema({
       }, 
       dateNotif: {
         type: Date,
+      },
+      dateEntree: {
+        type: Date,
+      },
+      statut: {
+        type: String,
+        enum: ["Actif", "Inactif", "Retraité"],
+        default: "Actif",
+      },
+      typeContrat: {
+        type: String,
       },
       photo: {
         type: String,
