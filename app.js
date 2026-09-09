@@ -41,6 +41,8 @@ const allowedOrigins = [
   "http://127.0.0.1:3000",
   "http://localhost:3004",
   "http://127.0.0.1:3004",
+  "http://10.140.0.104:3027",
+  "http://10.140.0.104:3027/",
 ];
 
 const corsOptions = {
