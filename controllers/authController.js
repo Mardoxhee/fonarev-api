@@ -14,6 +14,16 @@ exports.signup = async (req, res) => {
   try {
     const newAccount = await Account.create(req.body);
     const token = signToken(newAccount._id);
+    res.locals.auditAction = "signup";
+    res.locals.auditModule = "accounts";
+    res.locals.auditResourceId = newAccount._id;
+    res.locals.auditActor = {
+      id: newAccount._id,
+      firstName: newAccount.firstName,
+      lastName: newAccount.lastName,
+      email: newAccount.email,
+      role: newAccount.role,
+    };
     res.status(201).json({
       status: "Le compte a été créé avec succès!",
       accountId: newAccount._id,
@@ -69,6 +79,16 @@ exports.login = async (req, res, next) => {
     // 3) if every thing is ok, then send the token to the client and
 
     const token = signToken(account._id);
+    res.locals.auditAction = "login";
+    res.locals.auditModule = "accounts";
+    res.locals.auditResourceId = account._id;
+    res.locals.auditActor = {
+      id: account._id,
+      firstName: account.firstName,
+      lastName: account.lastName,
+      email: account.email,
+      role: account.role,
+    };
 
     res.status(200).json({
       status: "connected to the platform",
@@ -96,16 +116,25 @@ exports.protect = async (req, res, next) => {
   }
 
   if (token) {
-    jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    jwt.verify(token, SECRET_KEY, async (err, decoded) => {
       if (err) {
         return res.status(401).json("token_not_valid");
       } else {
         req.decoded = decoded;
+        const accountId = decoded.id || decoded.user?.id || decoded.user?._id;
+        if (!accountId) {
+          return res.status(401).json("token_not_valid");
+        }
+
+        req.account = await Account.findById(accountId).select("firstName lastName email role active");
+        if (!req.account || req.account.active === false) {
+          return res.status(401).json("account_not_found");
+        }
 
         const expiresIn = 24 * 60 * 60;
         const newToken = jwt.sign(
           {
-            user: decoded.user,
+            id: accountId,
           },
           SECRET_KEY,
           {
@@ -122,115 +151,122 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-// exports.restrictTo = (roles) => {
-//   return async (req, res, next) => {
-//     await Account.findById(req.decoded.id).then(async (account) => {
-//       if (!roles.includes(account.role)) {
-//         return res.status(403).json({
-//           status: "fail",
-//           message: "you do not have permission to do this action",
-//         });
-//       }
-//       if (data.role === "user") {
-//         await Restaurant.findById(req.params.id).then((restaurant) => {
-//           if (restaurant.account !== req.decoded.id) {
-//             return res.status(403).json({
-//               status: "fail",
-//               message: "unauthorized",
-//             });
-//           }
-//         });
-//       }
-//     });
-//     next();
-//   };
-// };
+exports.restrictTo = (...roles) => {
+  const allowedRoles = roles.map((role) => String(role).trim().toLowerCase());
+  return async (req, res, next) => {
+    const accountId = req.decoded?.id || req.decoded?.user?.id || req.decoded?.user?._id;
+    const account = req.account || (accountId ? await Account.findById(accountId).select("role") : null);
+    const role = String(account?.role || "").trim().toLowerCase();
 
-// exports.forgotPassword = async (req, res, next) => {
-//   // 1) get Account based on posted email
+    if (!allowedRoles.includes(role)) {
+      return res.status(403).json({
+        status: "failed",
+        message: "Vous n'avez pas la permission d'effectuer cette action.",
+      });
+    }
 
-//   const account = await Account.findOne({ email: req.body.email });
-//   if (!account) {
-//     return res
-//       .status(404)
-//       .json({ messagestatus: "failed", message: "no account with this email" });
-//   }
+    next();
+  };
+};
 
-//   // 2) generate the random token for t
-
-//   const resetToken = account.createPasswordResetToken();
-//   await account.save({ validateBeforeSave: false });
-//   // Send it to account's email address
-//   const resetURL = `${req.protocol}://${req.get(
-//     "host"
-//   )}/api/accounts/resetPassword/${resetToken}`;
-//   const message = `forgot your password? submit a PATCH request to your new password and passwordConfirm to : ${resetURL}.\n if you didn't forget it, plz ignore this message`;
-//   try {
-//     await sendMail({
-//       email: account.email,
-//       subject: "your password reset token (valid for 10minutes)",
-//       message,
-//     });
-//     res.status(200).json({ status: "success", message: "token sent to mail" });
-//   } catch (err) {
-//     Account.passwordResetToken = undefined;
-//     Account.passwordResetExpires = undefined;
-//     await account.save({ validateBeforeSave: false });
-//     return res
-//       .status(500)
-//       .json({ status: "failed", message: "error while sending email" });
-//   }
-// };
-
-
-// Fonction de changement de mot de passe
 exports.forgotPassword = async (req, res) => {
   try {
-    const { oldPassword, newPassword, newPasswordConfirm } = req.body;
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({
+        status: "failed",
+        message: "L'adresse email est obligatoire.",
+      });
+    }
 
-    // Vérifier que les champs requis sont présents
+    const account = await Account.findOne({ email });
+    if (!account) {
+      return res.status(200).json({
+        status: "Success",
+        message: "Si ce compte existe, un lien de réinitialisation a été envoyé.",
+      });
+    }
+
+    const resetToken = account.createPasswordResetToken();
+    await account.save({ validateBeforeSave: false });
+
+    const frontendURL = process.env.FRONTEND_URL || process.env.CLIENT_URL;
+    const appResetURL = frontendURL
+      ? `${frontendURL.replace(/\/$/, "")}/reset-password/${resetToken}`
+      : `${req.protocol}://${req.get("host")}/accounts/resetPassword/${resetToken}`;
+    const apiResetURL = `${req.protocol}://${req.get("host")}/accounts/resetPassword/${resetToken}`;
+
+    if (process.env.SENDGRID_API_KEY) {
+      await sendMail({
+        to: account.email,
+        subject: "Réinitialisation de votre mot de passe FONAREV",
+        html: `<p>Bonjour ${account.firstName || ""},</p><p>Vous pouvez réinitialiser votre mot de passe avec ce lien valable 10 minutes :</p><p><a href="${appResetURL}">${appResetURL}</a></p><p>Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>`,
+        message: `Réinitialisez votre mot de passe avec ce lien valable 10 minutes : ${appResetURL}`,
+      });
+    }
+
+    const payload = {
+      status: "Success",
+      message: "Si ce compte existe, un lien de réinitialisation a été envoyé.",
+    };
+
+    if (process.env.NODE_ENV !== "production" || process.env.RETURN_RESET_TOKEN === "true") {
+      payload.resetToken = resetToken;
+      payload.resetURL = apiResetURL;
+    }
+
+    res.status(200).json(payload);
+  } catch (err) {
+    if (req.body && req.body.email) {
+      await Account.findOneAndUpdate(
+        { email: req.body.email },
+        { $unset: { passwordResetToken: "", passwordResetExpires: "" } }
+      );
+    }
+    res.status(500).json({
+      status: "failed",
+      message: err.message,
+    });
+  }
+};
+
+exports.updateMyPassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword, newPasswordConfirm } = req.body;
     if (!oldPassword || !newPassword || !newPasswordConfirm) {
       return res.status(400).json({
         status: "failed",
-        message: "Vous devez fournir l'ancien mot de passe et le nouveau mot de passe",
+        message: "Vous devez fournir l'ancien mot de passe et le nouveau mot de passe.",
       });
     }
 
-    // 1) Obtenir l'utilisateur actuellement connecté (basé sur l'ID JWT)
-    const account = await Account.findById(req.decoded.id).select("+password");
-
+    const accountId = req.decoded?.id || req.decoded?.user?.id || req.decoded?.user?._id;
+    const account = await Account.findById(accountId).select("+password");
     if (!account) {
       return res.status(401).json({
         status: "failed",
-        message: "Utilisateur non trouvé",
+        message: "Utilisateur non trouvé.",
       });
     }
 
-    // 2) Vérifier si l'ancien mot de passe est correct
     if (!(await account.correctPassword(oldPassword, account.password))) {
       return res.status(401).json({
         status: "failed",
-        message: "L'ancien mot de passe est incorrect",
+        message: "L'ancien mot de passe est incorrect.",
       });
     }
 
-    // 3) Vérifier que les nouveaux mots de passe correspondent
-    if (newPassword !== newPasswordConfirm) {
-      return res.status(400).json({
-        status: "failed",
-        message: "Les nouveaux mots de passe ne correspondent pas",
-      });
-    }
-
-    // 4) Si tout est correct, mettre à jour le mot de passe
     account.password = newPassword;
     account.passwordConfirm = newPasswordConfirm;
     await account.save();
 
-    // 5) Générer un nouveau token et le renvoyer
     const token = signToken(account._id);
+    res.locals.auditAction = "update_password";
+    res.locals.auditModule = "accounts";
+    res.locals.auditResourceId = account._id;
+
     res.status(200).json({
-      status: "success",
+      status: "Success",
       message: "Mot de passe changé avec succès",
       token,
     });
@@ -242,29 +278,49 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-exports.resetPassword = async (req, res, next) => {
-  // 1) get account based on the resetToken
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
-  const account = await user.fidOne({
-    passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() },
-  });
+exports.resetPassword = async (req, res) => {
+  try {
+    const rawToken = req.params.token || req.body.token || req.query.token;
+    if (!rawToken) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Token de réinitialisation manquant.",
+      });
+    }
 
-  // 2) if token has has not expired, and there is account, set the new password
-  if (!account) {
-    return reqres
-      .status(400)
-      .json({ status: "failed,", message: "token is invalid or expired" });
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const account = await Account.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!account) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Le token est invalide ou expiré.",
+      });
+    }
+
+    account.password = req.body.password;
+    account.passwordConfirm = req.body.passwordConfirm;
+    account.passwordResetToken = undefined;
+    account.passwordResetExpires = undefined;
+    await account.save();
+
+    const token = signToken(account._id);
+    res.locals.auditAction = "reset_password";
+    res.locals.auditModule = "accounts";
+    res.locals.auditResourceId = account._id;
+
+    res.status(200).json({
+      status: "Success",
+      message: "Mot de passe réinitialisé avec succès.",
+      token,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "failed",
+      message: err.message,
+    });
   }
-  account.password = req.body.password;
-  account.passwordConfirm = req.body.passwordConfirm;
-  account.passwordResetToken = undefined;
-  account.passwordResetExpires = undefined;
-  await user.save();
-
-  const token = signToken(user._id);
-  res.status(200).json({ status: "success", token });
 };

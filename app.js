@@ -25,16 +25,22 @@ const marcheRouter = require("./routes/marcheRoutes")
 const offreEmploiRouter = require("./routes/offreEmploiRoutes")
 const newsletterRouter = require("./routes/newsletterRoutes")
 const applicationFormRouter = require("./routes/applicationFormRoutes")
+const auditLogRouter = require("./routes/auditLogRoutes")
+const roleRouter = require("./routes/roleRoutes")
+const auditLogger = require("./middlewares/auditLogger")
 
 app.use(bp.json())
 var cors = require("cors");
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
 app.use(express.raw({ limit: '500mb', type: '*/*' }));
+app.use(auditLogger);
 
 const allowedOrigins = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
+  "http://localhost:3004",
+  "http://127.0.0.1:3004",
 ];
 
 const corsOptions = {
@@ -82,6 +88,8 @@ app.use("/marches", cors(corsOptions), marcheRouter);
 app.use("/offres-emploi", cors(corsOptions), offreEmploiRouter);
 app.use("/newsletters", cors(corsOptions), newsletterRouter);
 app.use("/formulaires", cors(corsOptions), applicationFormRouter);
+app.use("/logs", cors(corsOptions), auditLogRouter);
+app.use("/roles", cors(corsOptions), roleRouter);
 
 
 
