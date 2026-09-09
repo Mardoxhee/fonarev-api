@@ -7,6 +7,12 @@ const provinceSchema = new mongoose.Schema({
   nom : {
       type : String
   },
+  Province: {
+    type: String,
+  },
+  province: {
+    type: String,
+  },
   superficie: {
     type: Number,
   },

@@ -10,10 +10,14 @@ const withDirectionStats = async (directions) => {
   const items = Array.isArray(directions) ? directions : [directions].filter(Boolean);
 
   return Promise.all(items.map(async (direction) => {
+    const [divisionIds, serviceIds] = await Promise.all([
+      Division.find({ direction: direction._id }).distinct("_id"),
+      Service.find({ direction: direction._id }).distinct("_id"),
+    ]);
     const [nombreAgents, nombreServices, nombreDivisions] = await Promise.all([
-      Agent.countDocuments({ direction: direction._id }),
-      Service.countDocuments({ direction: direction._id }),
-      Division.countDocuments({ direction: direction._id }),
+      Agent.countDocuments({ $or: [{ direction: direction._id }, { division: { $in: divisionIds } }, { serviceRef: { $in: serviceIds } }] }),
+      Promise.resolve(serviceIds.length),
+      Promise.resolve(divisionIds.length),
     ]);
     const plainDirection = direction.toObject ? direction.toObject() : direction;
 
@@ -132,6 +136,18 @@ exports.updateDirection = async (req, res) => {
 
 exports.deleteDirection = async (req, res) => {
   try {
+    const [linkedDivisions, linkedServices, linkedAgents] = await Promise.all([
+      Division.countDocuments({ direction: req.params.id }),
+      Service.countDocuments({ direction: req.params.id }),
+      Agent.countDocuments({ direction: req.params.id }),
+    ]);
+    if (linkedDivisions > 0 || linkedServices > 0 || linkedAgents > 0) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Impossible de supprimer cette direction: des divisions, services ou agents y sont encore rattachés.",
+      });
+    }
+
     await Direction.findByIdAndDelete(req.params.id);
     res.status(200).json({
       status: "Direction deleted successfully",

@@ -103,6 +103,9 @@ exports.createDocument = async (req, res) => {
     }
 
     const newDocument = await Document.create(body);
+    if (body.agent) {
+      await Agent.findByIdAndUpdate(body.agent, { $addToSet: { documents: newDocument._id } });
+    }
     res.status(201).json({
       status: "document created successfully",
       document: newDocument,

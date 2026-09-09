@@ -22,13 +22,26 @@ const syncDirectionDivision = async (division, previousDirection) => {
   }
 };
 
+const syncDivisionServicesDirection = async (division, previousDirection) => {
+  if (!division || !previousDirection || String(previousDirection) === String(division.direction)) return;
+
+  const serviceIds = await Service.find({ division: division._id }).distinct("_id");
+  if (!serviceIds.length) return;
+
+  await Promise.all([
+    Service.updateMany({ _id: { $in: serviceIds } }, { direction: division.direction }),
+    Direction.findByIdAndUpdate(previousDirection, { $pull: { services: { $in: serviceIds } } }),
+    Direction.findByIdAndUpdate(division.direction, { $addToSet: { services: { $each: serviceIds } } }),
+  ]);
+};
+
 const withDivisionStats = async (divisions) => {
   const items = Array.isArray(divisions) ? divisions : [divisions].filter(Boolean);
   return Promise.all(items.map(async (division) => {
+    const serviceIds = await Service.find({ division: division._id }).distinct("_id");
     const [nombreServices, nombreAgents] = await Promise.all([
-      Service.countDocuments({ division: division._id }),
-      Service.find({ division: division._id }).distinct("_id")
-        .then((serviceIds) => Agent.countDocuments({ service: { $in: serviceIds.map(String) } })),
+      Promise.resolve(serviceIds.length),
+      Agent.countDocuments({ $or: [{ division: division._id }, { serviceRef: { $in: serviceIds } }] }),
     ]);
 
     const plainDivision = division.toObject ? division.toObject() : division;
@@ -125,7 +138,10 @@ exports.updateDivision = async (req, res) => {
       .populate("responsable", agentSelect)
       .populate("services");
 
-    if (division) await syncDirectionDivision(division, previousDivision && previousDivision.direction);
+    if (division) {
+      await syncDirectionDivision(division, previousDivision && previousDivision.direction);
+      await syncDivisionServicesDirection(division, previousDivision && previousDivision.direction);
+    }
 
     res.status(200).json({
       status: "success",
@@ -141,6 +157,17 @@ exports.updateDivision = async (req, res) => {
 
 exports.deleteDivision = async (req, res) => {
   try {
+    const [linkedServices, linkedAgents] = await Promise.all([
+      Service.countDocuments({ division: req.params.id }),
+      Agent.countDocuments({ division: req.params.id }),
+    ]);
+    if (linkedServices > 0 || linkedAgents > 0) {
+      return res.status(400).json({
+        status: "failed",
+        message: "Impossible de supprimer cette division: des services ou agents y sont encore rattachés.",
+      });
+    }
+
     const division = await Division.findByIdAndDelete(req.params.id);
     if (division && division.direction) {
       await Direction.findByIdAndUpdate(division.direction, { $pull: { divisions: division._id } });

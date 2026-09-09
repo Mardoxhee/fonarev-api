@@ -81,6 +81,7 @@ const agentSchema = new mongoose.Schema({
       service: {
         type: String,
       },
+      serviceRef:{ type: mongoose.Schema.Types.ObjectId, ref:  "Service" },
       // direction: {
       //   type: String,
       // },

@@ -15,8 +15,8 @@ const {
   router
   .route("/:id")
   .get(getOneService)
-  .patch(updateService)
-  .delete(deleteService);
+  .patch(protect, updateService)
+  .delete(protect, deleteService);
 
 
 module.exports = router;
