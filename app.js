@@ -37,6 +37,7 @@ app.use(express.raw({ limit: '500mb', type: '*/*' }));
 app.use(auditLogger);
 
 const allowedOrigins = [
+  "https://hrms.fonasite.app",
   "http://localhost:3000",
   "http://127.0.0.1:3000",
   "http://localhost:3004",
