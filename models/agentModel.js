@@ -3,6 +3,23 @@ const validator = require("validator");
 
 const agentSchema = new mongoose.Schema({
 
+    lieuNaissance: String,
+    nombreConjoints: Number,
+    nombrePersonnesCharge: Number,
+    responsableDirect: String,
+    lieuRecrutement: String,
+    lieuPrestation: String,
+    regionAffectation: String,
+    mutation: Boolean,
+    dateFinContrat: Date,
+    hrmsFinance: {
+      type: new mongoose.Schema({ numeroCNSS: String, numeroCompte: String, banque: String }, { _id: false }),
+      select: false,
+    },
+    hrmsArchived: { type: Boolean, default: false, index: true },
+    hrmsArchivedAt: Date,
+    hrmsImport: { batch: { type: mongoose.Schema.Types.ObjectId, ref: 'HrmsImport' }, row: Number, importedAt: Date },
+
     noms: {
       type: String,
       // required: [true, "Renseignez le nom"],

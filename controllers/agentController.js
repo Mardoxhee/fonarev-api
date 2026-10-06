@@ -76,7 +76,7 @@ const buildSort = (sortQuery) => {
 };
 
 const buildAgentQuery = async (queryParams) => {
-  const query = {};
+  const query = { hrmsArchived: { $ne: true } };
   const andFilters = [];
 
   if (queryParams.statut) query.statut = queryParams.statut;
@@ -156,6 +156,8 @@ const buildAgentQuery = async (queryParams) => {
 
 const normalizeAgentPayload = async (payload) => {
   const body = { ...payload };
+  // Import metadata and banking details are writable only through the protected HRMS workflow.
+  for (const field of Object.keys(body)) if (/^hrms|^\$/.test(field) || field.includes('.')) delete body[field];
   if (body.etatCivil !== undefined && body.etatcivile === undefined) body.etatcivile = body.etatCivil;
   if (body.nombreEnfants !== undefined && body.nombrenfants === undefined) body.nombrenfants = body.nombreEnfants;
   if (body.serviceId !== undefined && body.serviceRef === undefined) body.serviceRef = body.serviceId;
@@ -218,6 +220,7 @@ exports.createAgent = async (req, res) => {
       const page = req.query.page * 1 || 1;
       const limit = req.query.limit * 1 || 20;
       const skip = (page - 1) * limit;
+      if (/hrmsFinance/i.test(String(req.query.fields || ''))) return res.status(403).json({ message: 'Les données bancaires nécessitent un accès RH dédié.' });
       const fields = req.query.fields ? String(req.query.fields).split(",").join(" ") : "-__v";
       const sort = buildSort(req.query.sort);
       const agentQuery = await buildAgentQuery(req.query);
@@ -300,7 +303,7 @@ exports.getOneAgent= async (req, res) => {
       exports.getAgentByMatricule = async (req, res) => {
         try {
           // Recherche de l'agent par son matricule
-          const agent = await Agent.findOne({ matricule: req.params.matricule });
+          const agent = await Agent.findOne({ matricule: req.params.matricule, hrmsArchived: { $ne: true } });
       
           if (!agent) {
             return res.status(404).json({

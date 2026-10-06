@@ -41,7 +41,7 @@ const withDivisionStats = async (divisions) => {
     const serviceIds = await Service.find({ division: division._id }).distinct("_id");
     const [nombreServices, nombreAgents] = await Promise.all([
       Promise.resolve(serviceIds.length),
-      Agent.countDocuments({ $or: [{ division: division._id }, { serviceRef: { $in: serviceIds } }] }),
+      Agent.countDocuments({ hrmsArchived: { $ne: true }, $or: [{ division: division._id }, { serviceRef: { $in: serviceIds } }] }),
     ]);
 
     const plainDivision = division.toObject ? division.toObject() : division;

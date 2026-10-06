@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { protect } = require("./../controllers/authController");
+const { protect, restrictTo } = require("./../controllers/authController");
 
 const {
   createAgent,
@@ -23,6 +23,12 @@ const {
   updateDisciplinaryEvent,
   deleteDisciplinaryEvent,
 } = require("../controllers/disciplinaryEventController");
+
+const hrmsImport = require('../controllers/hrmsImportController');
+const importRoles = restrictTo('admin', 'administrateur', 'superadmin', 'rh', 'drh', 'dg');
+router.post('/hrms-import/preview', protect, importRoles, hrmsImport.preview);
+router.post('/hrms-import/:importId/commit', protect, importRoles, hrmsImport.commit);
+router.get('/:id/hrms-finance', protect, importRoles, hrmsImport.getFinance);
 
 // Route pour récupérer tous les agents et créer un nouvel agent
 router.route("/").get(protect, getAgents).post(protect, createAgent);

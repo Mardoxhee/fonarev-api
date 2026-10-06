@@ -15,7 +15,7 @@ const withDirectionStats = async (directions) => {
       Service.find({ direction: direction._id }).distinct("_id"),
     ]);
     const [nombreAgents, nombreServices, nombreDivisions] = await Promise.all([
-      Agent.countDocuments({ $or: [{ direction: direction._id }, { division: { $in: divisionIds } }, { serviceRef: { $in: serviceIds } }] }),
+      Agent.countDocuments({ hrmsArchived: { $ne: true }, $or: [{ direction: direction._id }, { division: { $in: divisionIds } }, { serviceRef: { $in: serviceIds } }] }),
       Promise.resolve(serviceIds.length),
       Promise.resolve(divisionIds.length),
     ]);

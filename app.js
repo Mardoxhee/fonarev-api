@@ -29,6 +29,7 @@ const auditLogRouter = require("./routes/auditLogRoutes")
 const roleRouter = require("./routes/roleRoutes")
 const auditLogger = require("./middlewares/auditLogger")
 
+app.use('/agents/hrms-import', bp.json({ limit: '8mb' }));
 app.use(bp.json())
 var cors = require("cors");
 app.use(express.json({ limit: '500mb' }));
