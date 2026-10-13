@@ -14,6 +14,7 @@ const gradeSchema = new mongoose.Schema({
   salaire: Number,
   perdiem: Number, 
   autre: String, 
+  account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
   conge: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
   
 });

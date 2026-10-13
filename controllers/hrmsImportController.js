@@ -116,3 +116,24 @@ exports.getFinance = async (req, res) => {
     res.json({ finance: agent.hrmsFinance || null });
   } catch { res.status(400).json({ message: 'Données administratives indisponibles.' }); }
 };
+
+exports.updateFinance = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Identifiant agent invalide.' });
+    const fields = ['banque', 'numeroCompte', 'numeroCNSS'];
+    const updates = {};
+    for (const field of fields) {
+      if (!Object.prototype.hasOwnProperty.call(req.body || {}, field)) continue;
+      if (typeof req.body[field] !== 'string' || req.body[field].length > 200) {
+        return res.status(400).json({ message: 'Les coordonnées doivent être du texte de 200 caractères maximum.' });
+      }
+      updates[`hrmsFinance.${field}`] = req.body[field].trim();
+    }
+    if (!Object.keys(updates).length) return res.status(400).json({ message: 'Aucune coordonnée à modifier.' });
+    const agent = await Agent.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true, runValidators: true }).select('+hrmsFinance');
+    if (!agent) return res.status(404).json({ message: 'Agent introuvable.' });
+    res.locals.auditAction = 'update_finance';
+    res.locals.auditResourceId = agent._id;
+    res.json({ finance: agent.hrmsFinance || null });
+  } catch { res.status(400).json({ message: 'Impossible de modifier les coordonnées bancaires.' }); }
+};

@@ -29,6 +29,7 @@ const importRoles = restrictTo('admin', 'administrateur', 'superadmin', 'rh', 'd
 router.post('/hrms-import/preview', protect, importRoles, hrmsImport.preview);
 router.post('/hrms-import/:importId/commit', protect, importRoles, hrmsImport.commit);
 router.get('/:id/hrms-finance', protect, importRoles, hrmsImport.getFinance);
+router.patch('/:id/hrms-finance', protect, importRoles, hrmsImport.updateFinance);
 
 // Route pour récupérer tous les agents et créer un nouvel agent
 router.route("/").get(protect, getAgents).post(protect, createAgent);
