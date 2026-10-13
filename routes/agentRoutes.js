@@ -3,6 +3,7 @@ const router = express.Router();
 const { protect, restrictTo } = require("./../controllers/authController");
 
 const {
+  archiveAgent,
   createAgent,
   getAgents,
   getOneAgent,
@@ -28,6 +29,7 @@ const hrmsImport = require('../controllers/hrmsImportController');
 const importRoles = restrictTo('admin', 'administrateur', 'superadmin', 'rh', 'drh', 'dg');
 router.post('/hrms-import/preview', protect, importRoles, hrmsImport.preview);
 router.post('/hrms-import/:importId/commit', protect, importRoles, hrmsImport.commit);
+router.patch('/:id/archive', protect, importRoles, archiveAgent);
 router.get('/:id/hrms-finance', protect, importRoles, hrmsImport.getFinance);
 router.patch('/:id/hrms-finance', protect, importRoles, hrmsImport.updateFinance);
 

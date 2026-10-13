@@ -374,3 +374,15 @@ exports.getOneAgent= async (req, res) => {
                   });
                 }
               };
+
+exports.archiveAgent = async (req, res) => {
+  try {
+    const agent = await Agent.findByIdAndUpdate(req.params.id, {
+      $set: { hrmsArchived: true, hrmsArchivedAt: new Date() },
+    }, { new: true, runValidators: true });
+    if (!agent) return res.status(404).json({ message: 'Agent introuvable.' });
+    res.locals.auditAction = 'archive';
+    res.locals.auditResourceId = agent._id;
+    res.json({ status: 'success', message: 'Agent archivé.' });
+  } catch { res.status(400).json({ message: 'Impossible de retirer cet agent.' }); }
+};
