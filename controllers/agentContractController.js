@@ -8,6 +8,10 @@ function validateEnd(body, agent) {
   if (body.dateEffet > new Date().toISOString().slice(0, 10)) throw new Error('La date de fin ne peut pas être future.');
   if (agent.dateEntree && date < new Date(agent.dateEntree)) throw new Error('La fin ne peut pas précéder l’entrée en service.');
   for (const key of ['reference', 'observations']) if (body[key] !== undefined && (typeof body[key] !== 'string' || body[key].length > (key === 'reference' ? 200 : 4000))) throw new Error('Référence ou observations invalides.');
+  if (body.annexe != null) {
+    const file = body.annexe;
+    if (typeof file !== 'object' || Array.isArray(file) || typeof file.url !== 'string' || !file.url.trim() || file.url.length > 4096 || !/^https?:\/\//i.test(file.url) && /[:\\]/.test(file.url) || typeof file.fileName !== 'string' || !file.fileName.trim() || file.fileName.length > 255 || typeof file.mimeType !== 'string' || file.mimeType.length > 200) throw new Error('Document annexe invalide.');
+  }
   return date;
 }
 exports.validateEnd = validateEnd;
@@ -18,6 +22,7 @@ exports.endContract = async (req, res) => {
     if (modalities.includes(current.statut) && (current.finsContrat?.length || req.body.modalite !== current.statut)) return res.status(409).json({ message: 'Cet agent est déjà sorti des effectifs.' });
     const date = validateEnd(req.body, current);
     const event = { modalite: req.body.modalite, dateEffet: date, reference: (req.body.reference || '').trim(), observations: (req.body.observations || '').trim(), ancienStatut: current.statut, enregistreLe: new Date(), enregistrePar: req.account?._id };
+    if (req.body.annexe) event.annexe = { url: req.body.annexe.url.trim(), fileName: req.body.annexe.fileName.trim(), mimeType: req.body.annexe.mimeType };
     const agent = await Agent.findOneAndUpdate({ _id: current._id, statut: current.statut, 'finsContrat.0': { $exists: false } }, { $set: { statut: event.modalite, dateFinContrat: date }, $push: { finsContrat: event } }, { new: true, runValidators: true }).populate('direction division serviceRef province');
     if (!agent) return res.status(409).json({ message: 'Le dossier a changé. Rechargez la fiche.' });
     res.locals.auditAction = 'fin_contrat';

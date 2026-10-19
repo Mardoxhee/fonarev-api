@@ -161,6 +161,13 @@ const buildAgentQuery = async (queryParams) => {
 
 const normalizeAgentPayload = async (payload) => {
   const body = { ...payload };
+  if (body.datePrevisionnelleRetraite !== undefined && body.datePrevisionnelleRetraite !== null) {
+    const value = body.datePrevisionnelleRetraite;
+    const date = typeof value === 'string' ? new Date(value) : new Date(NaN);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || !Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value) {
+      throw new Error('Date prévisionnelle de retraite invalide.');
+    }
+  }
   if (body.personnesPrisesEnChargeFonds !== undefined && body.personnesPrisesEnChargeFonds !== null && (!Number.isSafeInteger(body.personnesPrisesEnChargeFonds) || body.personnesPrisesEnChargeFonds < 0)) {
     throw new Error('Le nombre d’enfants pris en charge par le fonds doit être un entier positif ou nul.');
   }

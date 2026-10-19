@@ -44,3 +44,16 @@ test('salary validates numbers and permits zero or clearing, excluded from norma
     const res = response(); await updateSalary({ params: { id }, body: { salaireNetAcquis: value } }, res); assert.equal(res.code, 200); assert.equal(res.body.salaireNetAcquis, value);
   }
 });
+
+test('optional attachment is validated and retained in the contract history', async t => {
+  assert.ok(validateEnd(body, {}));
+  const annexe = { url: 'https://files.test/annexe.pdf', fileName: 'annexe.pdf', mimeType: 'application/pdf' };
+  assert.ok(validateEnd({ ...body, annexe }, {}));
+  for (const invalid of [{}, { ...annexe, url: 'javascript:alert(1)' }, { ...annexe, fileName: '' }]) assert.throws(() => validateEnd({ ...body, annexe: invalid }, {}));
+  t.mock.method(Agent, 'findById', async () => ({ _id: id, statut: 'Actif' }));
+  let stored;
+  t.mock.method(Agent, 'findOneAndUpdate', (filter, update) => { stored = update.$push.finsContrat; return { populate: async () => ({ _id: id, finsContrat: [stored] }) }; });
+  const res = response();
+  await endContract({ params: { id }, body: { ...body, annexe }, account: { _id: id } }, res);
+  assert.equal(res.code, 200); assert.deepEqual(stored.annexe, annexe);
+});
