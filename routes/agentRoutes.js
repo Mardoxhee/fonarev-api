@@ -29,6 +29,10 @@ const hrmsImport = require('../controllers/hrmsImportController');
 const importRoles = restrictTo('admin', 'administrateur', 'superadmin', 'rh', 'drh', 'dg');
 router.post('/hrms-import/preview', protect, importRoles, hrmsImport.preview);
 router.post('/hrms-import/:importId/commit', protect, importRoles, hrmsImport.commit);
+const contract = require('../controllers/agentContractController');
+router.post('/:id/fin-contrat', protect, importRoles, contract.endContract);
+router.get('/:id/salaire-net-acquis', protect, importRoles, contract.getSalary);
+router.patch('/:id/salaire-net-acquis', protect, importRoles, contract.updateSalary);
 router.patch('/:id/archive', protect, importRoles, archiveAgent);
 router.get('/:id/hrms-finance', protect, importRoles, hrmsImport.getFinance);
 router.patch('/:id/hrms-finance', protect, importRoles, hrmsImport.updateFinance);
@@ -45,6 +49,6 @@ router.route("/career/:eventId").patch(protect, updateCareerEvent).delete(protec
 router.route("/disciplinary/:eventId").patch(protect, updateDisciplinaryEvent).delete(protect, deleteDisciplinaryEvent);
 
 // Routes pour les opérations CRUD sur un agent spécifique par ID
-router.route("/:id").get(getOneAgent).patch(updateAgent).delete(deleteAgent);
+router.route("/:id").get(getOneAgent).patch(protect, importRoles, updateAgent).delete(deleteAgent);
 
 module.exports = router;

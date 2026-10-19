@@ -6,12 +6,28 @@ const agentSchema = new mongoose.Schema({
     lieuNaissance: String,
     nombreConjoints: Number,
     nombrePersonnesCharge: Number,
+    personnesPrisesEnChargeFonds: {
+      type: Number,
+      min: 0,
+      default: null,
+      validate: { validator: value => value == null || Number.isSafeInteger(value), message: 'Le nombre d’enfants pris en charge doit être un entier positif ou nul.' },
+    },
     responsableDirect: String,
     lieuRecrutement: String,
     lieuPrestation: String,
     regionAffectation: String,
     mutation: Boolean,
     dateFinContrat: Date,
+    salaireNetAcquis: { type: Number, min: 0, select: false },
+    finsContrat: [{
+      modalite: { type: String, enum: ['Retraité', 'Licencié', 'Décédé', 'Démissionnaire'], required: true },
+      dateEffet: { type: Date, required: true },
+      reference: String,
+      observations: String,
+      ancienStatut: String,
+      enregistreLe: { type: Date, default: Date.now },
+      enregistrePar: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
+    }],
     hrmsFinance: {
       type: new mongoose.Schema({ numeroCNSS: String, numeroCompte: String, banque: String }, { _id: false }),
       select: false,
@@ -86,7 +102,7 @@ const agentSchema = new mongoose.Schema({
       },
       statut: {
         type: String,
-        enum: ["Actif", "Inactif", "Retraité"],
+        enum: ["Actif", "Inactif", "Retraité", "Licencié", "Décédé", "Démissionnaire"],
         default: "Actif",
       },
       typeContrat: {

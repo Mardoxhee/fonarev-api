@@ -4,6 +4,9 @@ const Division = require("../models/divisionModel");
 const Direction = require("../models/directionModel");
 const Province = require("../models/provinceModel");
 
+// Legacy dossiers predate the statut field; they are active until explicitly ended.
+const activeStatusFilter = { $in: ['Actif', null, ''] };
+
 const objectIdPattern = /^[a-f\d]{24}$/i;
 
 const escapeRegex = (value = "") => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -79,7 +82,9 @@ const buildAgentQuery = async (queryParams) => {
   const query = { hrmsArchived: { $ne: true } };
   const andFilters = [];
 
-  if (queryParams.statut) query.statut = queryParams.statut;
+  if (queryParams.statut) query.statut = queryParams.statut === 'Tous les inactifs'
+    ? { $in: ['Inactif', 'Retraité', 'Licencié', 'Décédé', 'Démissionnaire'] }
+    : queryParams.statut === 'Actif' ? activeStatusFilter : queryParams.statut;
   if (queryParams.sexe) query.sexe = String(queryParams.sexe).toUpperCase();
   if (queryParams.grade) query.grade = new RegExp(`^${escapeRegex(queryParams.grade)}$`, "i");
 
@@ -156,6 +161,11 @@ const buildAgentQuery = async (queryParams) => {
 
 const normalizeAgentPayload = async (payload) => {
   const body = { ...payload };
+  if (body.personnesPrisesEnChargeFonds !== undefined && body.personnesPrisesEnChargeFonds !== null && (!Number.isSafeInteger(body.personnesPrisesEnChargeFonds) || body.personnesPrisesEnChargeFonds < 0)) {
+    throw new Error('Le nombre d’enfants pris en charge par le fonds doit être un entier positif ou nul.');
+  }
+  delete body.salaireNetAcquis;
+  delete body.finsContrat;
   // Import metadata and banking details are writable only through the protected HRMS workflow.
   for (const field of Object.keys(body)) if (/^hrms|^\$/.test(field) || field.includes('.')) delete body[field];
   if (body.etatCivil !== undefined && body.etatcivile === undefined) body.etatcivile = body.etatCivil;
@@ -191,6 +201,7 @@ const normalizeAgentPayload = async (payload) => {
 //Ici on a le controlleur de création d'un agent
 exports.createAgent = async (req, res) => {
   try {
+    if (['Retraité', 'Licencié', 'Décédé', 'Démissionnaire'].includes(req.body.statut)) return res.status(400).json({ message: "Créez le dossier puis enregistrez sa fin de contrat avec une date." });
     const newAgent = await Agent.create(await normalizeAgentPayload(req.body));
     res.status(201).json({
       status: "Agent enregistré avec succès !",
@@ -217,12 +228,16 @@ exports.createAgent = async (req, res) => {
   //Le controlleur d'affichage de tous les agents
   exports.getAgents = async (req, res) => {
     try {
-      const page = req.query.page * 1 || 1;
-      const limit = req.query.limit * 1 || 20;
+      const page = req.query.page === undefined ? 1 : Number(req.query.page);
+      const limit = req.query.limit === undefined ? 20 : Number(req.query.limit);
+      if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(limit) || limit < 1 || limit > 500 || !Number.isSafeInteger((page - 1) * limit)) {
+        return res.status(400).json({ message: 'Pagination invalide : page entière positive et limite entre 1 et 500.' });
+      }
       const skip = (page - 1) * limit;
-      if (/hrmsFinance/i.test(String(req.query.fields || ''))) return res.status(403).json({ message: 'Les données bancaires nécessitent un accès RH dédié.' });
+      if (/hrmsFinance|salaireNetAcquis/i.test(String(req.query.fields || ''))) return res.status(403).json({ message: 'Les données bancaires nécessitent un accès RH dédié.' });
       const fields = req.query.fields ? String(req.query.fields).split(",").join(" ") : "-__v";
-      const sort = buildSort(req.query.sort);
+      const requestedSort = buildSort(req.query.sort);
+      const sort = requestedSort.split(' ').some(field => field.replace(/^-/, '') === '_id') ? requestedSort : `${requestedSort} _id`;
       const agentQuery = await buildAgentQuery(req.query);
       const statuslessParams = { ...req.query };
       delete statuslessParams.statut;
@@ -239,14 +254,17 @@ exports.createAgent = async (req, res) => {
         .populate('account')
         .populate("province");
 
-      const [totalAgents, totalFemmes, totalHommes, totalTous, totalActifs, totalInactifs, totalRetraites] = await Promise.all([
+      const [totalAgents, totalFemmes, totalHommes, totalTous, totalActifs, totalInactifs, totalRetraites, totalLicencies, totalDecedes, totalDemissionnaires] = await Promise.all([
         Agent.countDocuments(agentQuery),
         Agent.countDocuments({ ...agentQuery, sexe: "F" }),
         Agent.countDocuments({ ...agentQuery, sexe: "M" }),
         Agent.countDocuments(statuslessQuery),
-        Agent.countDocuments({ ...statuslessQuery, statut: "Actif" }),
+        Agent.countDocuments({ ...statuslessQuery, statut: activeStatusFilter }),
         Agent.countDocuments({ ...statuslessQuery, statut: "Inactif" }),
         Agent.countDocuments({ ...statuslessQuery, statut: "Retraité" }),
+        Agent.countDocuments({ ...statuslessQuery, statut: "Licencié" }),
+        Agent.countDocuments({ ...statuslessQuery, statut: "Décédé" }),
+        Agent.countDocuments({ ...statuslessQuery, statut: "Démissionnaire" }),
       ]);
 
       res.status(200).json({
@@ -260,6 +278,9 @@ exports.createAgent = async (req, res) => {
           actifs: totalActifs,
           inactifs: totalInactifs,
           retraites: totalRetraites,
+          licencies: totalLicencies,
+          decedes: totalDecedes,
+          demissionnaires: totalDemissionnaires,
         },
         genderTotals: {
           femmes: totalFemmes,
@@ -337,7 +358,13 @@ exports.getOneAgent= async (req, res) => {
 
             exports.updateAgent = async (req, res) => {
                 try {
-                const agent = await Agent.findByIdAndUpdate(req.params.id, await normalizeAgentPayload(req.body), {
+                const current = await Agent.findById(req.params.id);
+                if (!current) return res.status(404).json({ message: 'Agent introuvable.' });
+                const terminal = ['Retraité', 'Licencié', 'Décédé', 'Démissionnaire'];
+                if ((req.body.statut !== undefined && req.body.statut !== current.statut && (terminal.includes(req.body.statut) || terminal.includes(current.statut))) || (current.finsContrat?.length && req.body.dateFinContrat !== undefined && new Date(req.body.dateFinContrat).getTime() !== new Date(current.dateFinContrat).getTime())) return res.status(400).json({ message: 'Utilisez l’action de fin de contrat. Une fin enregistrée ne peut pas être écrasée.' });
+                const body = await normalizeAgentPayload(req.body);
+                if (terminal.includes(current.statut)) delete body.dateFinContrat;
+                const agent = await Agent.findOneAndUpdate({ _id: req.params.id, statut: current.statut }, body, {
                     new: true,
                     runValidators: true,
                 })
@@ -347,6 +374,7 @@ exports.getOneAgent= async (req, res) => {
                 .populate('province')
                 .populate({ path: 'documents', populate: { path: 'documentType' } })
                 .populate('personnesAcharges');
+                if (!agent) return res.status(409).json({ message: 'Le dossier a changé. Rechargez la fiche.' });
                 res.status(200).json({
                     status: "Agent modifé avec succès !",
                     agent,
