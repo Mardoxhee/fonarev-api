@@ -69,6 +69,15 @@ const corsOptions = {
 
 
 
+const { protect: hrmProtect } = require('./controllers/authController');
+const { authorize: hrmAuthorize } = require('./middlewares/hrmAccess');
+const hrmPaths = ['/agents', '/accounts', '/roles', '/directions', '/divisions', '/services', '/grades', '/provinces', '/documents', '/personnes', '/logs', '/offres-emploi', '/candidatures', '/formulaires'];
+app.use(hrmPaths, cors(corsOptions), (req, res, next) => {
+  const path = req.originalUrl.split('?')[0];
+  if (/^\/accounts\/(login|forgotPassword)\/?$/.test(path) || /^\/accounts\/resetPassword\/[^/]+$/.test(path)) return next();
+  return hrmProtect(req, res, () => hrmAuthorize(req, res, next));
+});
+
 app.use("/agents", cors(corsOptions), AgentRouter);
 app.use("/accounts", cors(corsOptions), AccountRouter);
 app.use("/directions", cors(corsOptions), DirectionRouter);

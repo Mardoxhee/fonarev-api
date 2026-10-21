@@ -1,11 +1,19 @@
+const { normalizeRole, ROLES, MODULES, accessFor } = require('../middlewares/hrmAccess');
 const Account = require("../models/accountModel");
 
-const publicFields = "firstName lastName phone email role active createdAt updatedAt";
+const publicFields = "firstName lastName phone email role active guestModules createdAt updatedAt";
 
 const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const accountPayload = (body) => {
-  const allowed = ["firstName", "lastName", "phone", "email", "role", "active"];
+  body = { ...body };
+  if (body.role !== undefined) {
+    body.role = normalizeRole(body.role);
+    if (!ROLES.includes(body.role)) throw new Error('Rôle invalide.');
+  }
+  if (body.guestModules !== undefined && (!Array.isArray(body.guestModules) || body.guestModules.some(module => !MODULES.includes(module)))) throw new Error('Modules invités invalides.');
+  if (body.role && body.role !== 'invite') body.guestModules = [];
+  const allowed = ["firstName", "lastName", "phone", "email", "role", "active", "guestModules"];
   return allowed.reduce((payload, field) => {
     if (body[field] !== undefined) payload[field] = body[field];
     return payload;
@@ -162,3 +170,5 @@ exports.deleteAccount = async (req, res) => {
     });
   }
 };
+
+exports.getMyAccess = (req, res) => { res.set('Cache-Control', 'no-store'); res.json({ access: accessFor(req.account) }); };

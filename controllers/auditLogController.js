@@ -48,6 +48,7 @@ const buildQuery = (params) => {
 };
 
 exports.requireAuditAccess = async (req, res, next) => {
+  if (req.hrmAccess) return next();
   try {
     const accountId = req.decoded?.id || req.decoded?._id || req.user?.id || req.user?._id;
     const account = accountId ? await Account.findById(accountId).select("role") : null;

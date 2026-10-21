@@ -12,7 +12,12 @@ const signToken = (id) => {
 
 exports.signup = async (req, res) => {
   try {
-    const newAccount = await Account.create(req.body);
+    const { normalizeRole, ROLES, MODULES } = require('../middlewares/hrmAccess');
+    const role = normalizeRole(req.body.role || 'invite');
+    if (!ROLES.includes(role)) return res.status(400).json({ message: 'Rôle invalide.' });
+    const guestModules = req.body.guestModules || [];
+    if (!Array.isArray(guestModules) || guestModules.some(module => !MODULES.includes(module))) return res.status(400).json({ message: 'Modules invités invalides.' });
+    const newAccount = await Account.create({ ...req.body, role, guestModules: role === 'invite' ? guestModules : [] });
     const token = signToken(newAccount._id);
     res.locals.auditAction = "signup";
     res.locals.auditModule = "accounts";
@@ -67,7 +72,7 @@ exports.login = async (req, res, next) => {
 
     const account = await Account.findOne({ email }).select("+password ");
     if (
-      !account ||
+      !account || account.active === false ||
       !(await account.correctPassword(password, account.password))
     ) {
       return res
@@ -110,6 +115,7 @@ exports.login = async (req, res, next) => {
 const SECRET_KEY = process.env.JWT_SECRET;
 
 exports.protect = async (req, res, next) => {
+  if (req.account) return next();
   let token = req.headers["x-access-token"] || req.headers["authorization"];
   if (!!token && token.startsWith("Bearer ")) {
     token = token.slice(7, token.length);
@@ -126,7 +132,11 @@ exports.protect = async (req, res, next) => {
           return res.status(401).json("token_not_valid");
         }
 
-        req.account = await Account.findById(accountId).select("firstName lastName email role active");
+        try {
+          req.account = await Account.findById(accountId).select("firstName lastName email role active guestModules");
+        } catch {
+          return res.status(401).json({ message: 'Session invalide.' });
+        }
         if (!req.account || req.account.active === false) {
           return res.status(401).json("account_not_found");
         }
@@ -154,6 +164,7 @@ exports.protect = async (req, res, next) => {
 exports.restrictTo = (...roles) => {
   const allowedRoles = roles.map((role) => String(role).trim().toLowerCase());
   return async (req, res, next) => {
+    if (req.hrmAccess) return next();
     const accountId = req.decoded?.id || req.decoded?.user?.id || req.decoded?.user?._id;
     const account = req.account || (accountId ? await Account.findById(accountId).select("role") : null);
     const role = String(account?.role || "").trim().toLowerCase();

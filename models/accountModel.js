@@ -3,6 +3,8 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
+const { normalizeRole, ROLES, MODULES } = require('../middlewares/hrmAccess');
+
 const accountSchema = new mongoose.Schema({
   noteDebit: { type: mongoose.Schema.Types.ObjectId, ref: "NoteDebit" },
   notePerception: { type: mongoose.Schema.Types.ObjectId, ref: "NotePerception" },
@@ -28,9 +30,12 @@ const accountSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    default: "admin",
+    default: "invite",
+    enum: ROLES,
+    set: normalizeRole,
 
   },
+  guestModules: { type: [String], enum: MODULES, default: [] },
   active: {
     type: Boolean,
     default: true,
