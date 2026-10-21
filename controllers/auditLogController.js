@@ -5,11 +5,26 @@ const allowedLogRoles = new Set(["admin", "rh", "drh", "dg", "superadmin", "admi
 
 const parseDate = (value, endOfDay = false) => {
   if (!value) return undefined;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return undefined;
-  if (endOfDay) date.setHours(23, 59, 59, 999);
-  return date;
+  const text = String(value);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text) || new Date(`${text}T12:00:00Z`).toISOString().slice(0, 10) !== text) throw new Error('Date invalide (AAAA-MM-JJ attendu).');
+  // Audit calendar dates are interpreted in Africa/Kinshasa (UTC+01).
+  return new Date(`${text}T${endOfDay ? '23:59:59.999' : '00:00:00.000'}+01:00`);
 };
+const SsoAccount = require('../models/sso360Model');
+async function hydrateActors(logs) {
+  const ids = [...new Set(logs.map(log => log.actor?.account).filter(Boolean).map(String))];
+  if (!ids.length) return logs;
+  const fields = 'firstName lastName email role';
+  const [local, sso] = await Promise.all([Account.find({ _id: { $in: ids } }).select(fields).lean(), SsoAccount.find({ _id: { $in: ids } }).select(fields).lean()]);
+  const accounts = new Map([...local, ...sso].map(account => [String(account._id), account]));
+  return logs.map(log => {
+    const account = accounts.get(String(log.actor?.account));
+    if (!account) return log;
+    const actor = { ...log.actor };
+    for (const field of ['firstName', 'lastName', 'email', 'role']) if (!actor[field]) actor[field] = account[field];
+    return { ...log, actor };
+  });
+}
 
 const buildQuery = (params) => {
   const query = {};
@@ -17,12 +32,17 @@ const buildQuery = (params) => {
   if (params.module) query.module = String(params.module);
   if (params.action) query.action = String(params.action);
   if (params.method) query.method = String(params.method).toUpperCase();
-  if (params.success !== undefined) query.success = String(params.success) === "true";
-  if (params.statusCode) query.statusCode = Number(params.statusCode);
+  if (params.success !== undefined && params.success !== "") query.success = String(params.success) === "true";
+  if (params.statusCode) {
+    const status = Number(params.statusCode);
+    if (!Number.isInteger(status) || status < 100 || status > 599) throw new Error('Code HTTP invalide.');
+    query.statusCode = status;
+  }
   if (params.actor) query["actor.account"] = params.actor;
 
   const from = parseDate(params.from);
   const to = parseDate(params.to, true);
+  if (from && to && from > to) throw new Error('La date de début doit précéder la date de fin.');
   if (from || to) {
     query.createdAt = {};
     if (from) query.createdAt.$gte = from;
@@ -76,13 +96,18 @@ exports.getAuditLogs = async (req, res) => {
     const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 200);
     const skip = (page - 1) * limit;
     const query = buildQuery(req.query);
+    if (req.query.actorSearch) {
+      const regex = new RegExp(String(req.query.actorSearch).slice(0, 120).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), 'i');
+      const match = { $or: [{ firstName: regex }, { lastName: regex }, { email: regex }] };
+      const [local, sso] = await Promise.all([Account.find(match).select('_id').lean(), SsoAccount.find(match).select('_id').lean()]);
+      query.$and = [{ $or: [{ 'actor.firstName': regex }, { 'actor.lastName': regex }, { 'actor.email': regex }, { 'actor.account': { $in: [...local, ...sso].map(a => a._id) } }] }];
+    }
 
     const [logs, totalLogs] = await Promise.all([
       AuditLog.find(query)
-        .sort("-createdAt")
+        .sort({ createdAt: -1, _id: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("actor.account", "firstName lastName email role")
         .lean(),
       AuditLog.countDocuments(query),
     ]);
@@ -93,7 +118,7 @@ exports.getAuditLogs = async (req, res) => {
       totalLogs,
       page,
       limit,
-      logs,
+      logs: await hydrateActors(logs),
     });
   } catch (error) {
     res.status(400).json({
@@ -106,7 +131,6 @@ exports.getAuditLogs = async (req, res) => {
 exports.getAuditLog = async (req, res) => {
   try {
     const log = await AuditLog.findById(req.params.id)
-      .populate("actor.account", "firstName lastName email role")
       .lean();
 
     if (!log) {
@@ -118,7 +142,7 @@ exports.getAuditLog = async (req, res) => {
 
     res.status(200).json({
       status: "Success",
-      log,
+      log: (await hydrateActors([log]))[0],
     });
   } catch (error) {
     res.status(400).json({
@@ -131,6 +155,12 @@ exports.getAuditLog = async (req, res) => {
 exports.getAuditLogStats = async (req, res) => {
   try {
     const query = buildQuery(req.query);
+    if (req.query.actorSearch) {
+      const regex = new RegExp(String(req.query.actorSearch).slice(0, 120).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), 'i');
+      const match = { $or: [{ firstName: regex }, { lastName: regex }, { email: regex }] };
+      const [local, sso] = await Promise.all([Account.find(match).select('_id').lean(), SsoAccount.find(match).select('_id').lean()]);
+      query.$and = [{ $or: [{ 'actor.firstName': regex }, { 'actor.lastName': regex }, { 'actor.email': regex }, { 'actor.account': { $in: [...local, ...sso].map(a => a._id) } }] }];
+    }
     const [byModule, byAction, byUser, totalLogs, failures] = await Promise.all([
       AuditLog.aggregate([
         { $match: query },

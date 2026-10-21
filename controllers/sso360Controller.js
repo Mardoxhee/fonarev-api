@@ -65,6 +65,8 @@ exports.exchange = async (req, res) => {
     const lifetime = Math.min(300, Math.floor(claims.exp - Date.now() / 1000));
     if (lifetime <= 0) return fail(401, 'session', 'JWT_EXPIRED_DURING_EXCHANGE', 'Token 360 expiré pendant la connexion.');
     const sessionToken = jwt.sign({ id: String(account._id), authProvider: 'fonarev360' }, process.env.JWT_SECRET, { expiresIn: lifetime, algorithm: 'HS256' });
+    res.locals.auditActor = { id: account._id, firstName: account.firstName, lastName: account.lastName, email: account.email, role: account.role };
+    res.locals.auditAction = 'login';
     record('session', 'SESSION_CREATED');
     res.json({ diagnostic: { requestId, steps }, expiresIn: lifetime, token: sessionToken, user: { id: account._id, externalId: account.externalId, nom: account.lastName, prenom: account.firstName, email: account.email, role: account.role }, access: accessFor(account) });
   } catch { return fail(500, 'account', 'ACCOUNT_SYNC_FAILED', 'Impossible de synchroniser le compte HRMS.'); }

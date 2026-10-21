@@ -19,13 +19,18 @@ const getModuleFromPath = (path = "") => {
 const getSanitizedPath = (path = "") => path.split("?")[0] || "/";
 
 const getActorId = (req, res) => {
-  const actor = res.locals.auditActor || req.decoded || req.user || {};
+  const actor = res.locals.auditActor || req.account || req.decoded || req.user || {};
   const rawId = actor.id || actor._id || actor.accountId || actor.account || actor.user?.id || actor.user?._id;
   return rawId ? String(rawId) : undefined;
 };
 
 const buildActor = async (req, res) => {
-  const localActor = res.locals.auditActor || {};
+  const localActor = res.locals.auditActor || req.account || {};
+  if (localActor._id || localActor.id) return {
+    account: localActor._id || localActor.id,
+    firstName: localActor.firstName, lastName: localActor.lastName,
+    email: localActor.email, role: localActor.role,
+  };
   const actorId = getActorId(req, res);
   const canUseAccountId = actorId && objectIdPattern.test(actorId);
   if (!actorId) {
