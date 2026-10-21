@@ -23,6 +23,7 @@ const manageUsers = restrictTo("admin", "administrateur", "superadmin", "rh", "d
 
 router.post("/signup", protect, manageUsers, signup);
 router.post("/login", login);
+router.post("/sso360", require("../controllers/sso360Controller").exchange);
 router.post("/forgotPassword", forgotPassword);
 router.patch("/resetPassword/:token", resetPassword);
 router.patch("/resetPassword", resetPassword);

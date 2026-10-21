@@ -74,7 +74,7 @@ const { authorize: hrmAuthorize } = require('./middlewares/hrmAccess');
 const hrmPaths = ['/agents', '/accounts', '/roles', '/directions', '/divisions', '/services', '/grades', '/provinces', '/documents', '/personnes', '/logs', '/offres-emploi', '/candidatures', '/formulaires'];
 app.use(hrmPaths, cors(corsOptions), (req, res, next) => {
   const path = req.originalUrl.split('?')[0];
-  if (/^\/accounts\/(login|forgotPassword)\/?$/.test(path) || /^\/accounts\/resetPassword\/[^/]+$/.test(path)) return next();
+  if (/^\/accounts\/(login|sso360|forgotPassword)\/?$/.test(path) || /^\/accounts\/resetPassword\/[^/]+$/.test(path)) return next();
   return hrmProtect(req, res, () => hrmAuthorize(req, res, next));
 });
 

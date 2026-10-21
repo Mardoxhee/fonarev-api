@@ -133,7 +133,8 @@ exports.protect = async (req, res, next) => {
         }
 
         try {
-          req.account = await Account.findById(accountId).select("firstName lastName email role active guestModules");
+          const Model = decoded.authProvider === 'fonarev360' ? require('../models/sso360Model') : Account;
+          req.account = await Model.findById(accountId).select("firstName lastName email role active guestModules provider ssoModules ssoWriteModules");
         } catch {
           return res.status(401).json({ message: 'Session invalide.' });
         }
@@ -142,7 +143,7 @@ exports.protect = async (req, res, next) => {
         }
 
         const expiresIn = 24 * 60 * 60;
-        const newToken = jwt.sign(
+        const newToken = decoded.authProvider === 'fonarev360' ? token : jwt.sign(
           {
             id: accountId,
           },

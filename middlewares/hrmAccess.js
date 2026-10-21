@@ -6,6 +6,7 @@ function normalizeRole(role) {
   return ({ admin: 'superadmin', administrateur: 'superadmin', rh: 'rh_owner', drh: 'rh_owner', dg: 'rh_reader', manager: 'invite', utilisateur: 'invite' })[value] || value;
 }
 function accessFor(account) {
+  if (account.provider === 'fonarev360') return { role: account.role, canWrite: (account.ssoWriteModules || []).length > 0, modules: (account.ssoModules || []).filter(m => MODULES.includes(m)), writeModules: (account.ssoWriteModules || []).filter(m => MODULES.includes(m)) };
   const role = normalizeRole(account.role);
   const canWrite = ['rh_owner', 'superadmin'].includes(role);
   const modules = canWrite || role === 'rh_reader' ? MODULES : role === 'invite' ? (account.guestModules || []).filter(module => MODULES.includes(module)) : [];
@@ -28,6 +29,12 @@ function authorize(req, res, next) {
   // Reporting may fetch the list, but not individual dossiers or sensitive subresources.
   if (route === 'documents' && !/^\/documents\/types(?:\/|$)/.test(path)) modules = ['agents'];
   if (route === 'agents' && !/^\/agents\/?$/.test(path)) modules = ['agents'];
+  if (req.account.provider === 'fonarev360') {
+    const granted = read ? access.modules : access.writeModules;
+    const writeModule = ({ accounts: 'utilisateurs', roles: 'utilisateurs', agents: 'agents', personnes: 'agents', directions: 'reglages', divisions: 'reglages', services: 'reglages', grades: 'reglages', provinces: 'reglages', logs: 'reglages', documents: /^\/documents\/types(?:\/|$)/.test(path) ? 'reglages' : 'agents', 'offres-emploi': 'recrutement', candidatures: 'recrutement', formulaires: 'recrutement' })[route];
+    if (!(read ? modules : [writeModule]).some(m => granted.includes(m))) return res.status(403).json({ message: 'Module ou action non autorisé par 360.' });
+    return next();
+  }
   if (!access.canWrite && (!read || !modules.some(module => access.modules.includes(module)))) return res.status(403).json({ message: 'Vous ne disposez pas des habilitations nécessaires pour cette action.' });
   next();
 }
