@@ -11,6 +11,9 @@ const {
 
   } = require("../controllers/directionController");
 
+  const transfer = require('../controllers/directionTransferController');
+  router.get('/:id/dependencies', protect, transfer.dependencies);
+  router.post('/:id/transfer-and-delete', protect, transfer.transferAndDelete);
   router.route("/").get(protect,getAllDirections,
     ).post(protect, createDirection);
   router
