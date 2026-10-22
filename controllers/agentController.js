@@ -371,7 +371,7 @@ exports.getOneAgent= async (req, res) => {
                 if ((req.body.statut !== undefined && req.body.statut !== current.statut && (terminal.includes(req.body.statut) || terminal.includes(current.statut))) || (current.finsContrat?.length && req.body.dateFinContrat !== undefined && new Date(req.body.dateFinContrat).getTime() !== new Date(current.dateFinContrat).getTime())) return res.status(400).json({ message: 'Utilisez l’action de fin de contrat. Une fin enregistrée ne peut pas être écrasée.' });
                 const body = await normalizeAgentPayload(req.body);
                 if (terminal.includes(current.statut)) delete body.dateFinContrat;
-                const agent = await Agent.findOneAndUpdate({ _id: req.params.id, statut: current.statut }, body, {
+                const agent = await Agent.findOneAndUpdate({ _id: req.params.id, statut: current.statut === 'Actif' ? activeStatusFilter : current.statut }, body, {
                     new: true,
                     runValidators: true,
                 })
