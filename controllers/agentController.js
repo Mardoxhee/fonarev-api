@@ -365,13 +365,15 @@ exports.getOneAgent= async (req, res) => {
 
             exports.updateAgent = async (req, res) => {
                 try {
-                const current = await Agent.findById(req.params.id);
+                const current = await Agent.findById(req.params.id).lean();
                 if (!current) return res.status(404).json({ message: 'Agent introuvable.' });
                 const terminal = ['Retraité', 'Licencié', 'Décédé', 'Démissionnaire'];
                 if ((req.body.statut !== undefined && req.body.statut !== current.statut && (terminal.includes(req.body.statut) || terminal.includes(current.statut))) || (current.finsContrat?.length && req.body.dateFinContrat !== undefined && new Date(req.body.dateFinContrat).getTime() !== new Date(current.dateFinContrat).getTime())) return res.status(400).json({ message: 'Utilisez l’action de fin de contrat. Une fin enregistrée ne peut pas être écrasée.' });
                 const body = await normalizeAgentPayload(req.body);
                 if (terminal.includes(current.statut)) delete body.dateFinContrat;
-                const agent = await Agent.findOneAndUpdate({ _id: req.params.id, statut: current.statut === 'Actif' ? activeStatusFilter : current.statut }, body, {
+                // Compare the actual stored value, not a Mongoose default injected on read.
+                const expectedStatus = Object.prototype.hasOwnProperty.call(current, 'statut') ? current.statut : { $exists: false };
+                const agent = await Agent.findOneAndUpdate({ _id: req.params.id, statut: expectedStatus }, { $set: body }, {
                     new: true,
                     runValidators: true,
                 })
