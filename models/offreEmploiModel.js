@@ -50,7 +50,7 @@ const offreEmploiSchema = new mongoose.Schema(
     },
     datePublication: {
       type: Date,
-      default: Date.now,
+      default: undefined,
     },
     dateCloture: Date,
     documentUrl: String,
@@ -58,7 +58,7 @@ const offreEmploiSchema = new mongoose.Schema(
     formulaire: { type: mongoose.Schema.Types.ObjectId, ref: "ApplicationForm" },
     statut: {
       type: String,
-      enum: ["brouillon", "publie", "ferme", "archive", "annule"],
+      enum: ["brouillon", "en_validation", "valide", "publie", "suspendu", "ferme", "archive", "annule"],
       default: "brouillon",
     },
     isActive: {
@@ -69,6 +69,10 @@ const offreEmploiSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    historique: [{
+      from: String, to: String, date: { type: Date, default: Date.now },
+      actor: String, actorId: String,
+    }],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
   },
@@ -95,7 +99,7 @@ offreEmploiSchema.pre("validate", function (next) {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+      .replace(/^-|-$/g, "") + "-" + this._id.toString().slice(-8);
   }
   next();
 });
