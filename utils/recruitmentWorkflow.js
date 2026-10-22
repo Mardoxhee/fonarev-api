@@ -1,3 +1,4 @@
+const { criteriaLists, normalizeCriteria } = require('./recruitmentCriteria');
 const transitions = {
   brouillon: ['en_validation', 'archive'],
   en_validation: ['valide', 'brouillon', 'archive'],
@@ -6,16 +7,19 @@ const transitions = {
   suspendu: ['publie', 'brouillon', 'ferme'],
   ferme: ['archive'], annule: ['archive'], archive: [],
 };
-const fields = ['titre', 'reference', 'typeOffre', 'contractType', 'direction', 'lieuAffectation', 'resume', 'description', 'missions', 'profilRecherche', 'piecesRequises', 'nombrePostes', 'dateCloture'];
+const fields = ['minExperienceYears', 'educationLevel', 'requiredExperiences', ...criteriaLists, 'titre', 'reference', 'typeOffre', 'contractType', 'direction', 'lieuAffectation', 'resume', 'description', 'missions', 'profilRecherche', 'piecesRequises', 'nombrePostes', 'dateCloture'];
 function failure(message, status = 400) { return Object.assign(new Error(message), { status }); }
 function content(body) {
   const result = {};
   for (const key of fields) {
     if (!Object.prototype.hasOwnProperty.call(body, key)) continue;
     const value = body[key];
-    if (['missions', 'profilRecherche', 'piecesRequises'].includes(key)) {
+    if (['minExperienceYears', 'educationLevel', ...criteriaLists].includes(key)) {
+      result[key] = normalizeCriteria(key, value);
+    } else if (['missions', 'profilRecherche', 'piecesRequises'].includes(key)) {
       if (!Array.isArray(value) || value.some(item => typeof item !== 'string')) throw failure('Les listes doivent contenir du texte.');
-      result[key] = value.map(item => item.trim()).filter(Boolean);
+      result[key] = [...new Set(value.map(item => item.trim()).filter(Boolean))];
+      if (key === 'piecesRequises' && result[key].length > 20) throw failure('Maximum 20 pièces demandées par offre.');
     } else if (key === 'nombrePostes') {
       if (!Number.isInteger(value) || value < 1) throw failure('Le nombre de postes doit être un entier positif.');
       result[key] = value;

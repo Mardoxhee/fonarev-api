@@ -1,3 +1,4 @@
+const { candidateFilters } = require('../utils/recruitmentCriteria');
 const CandidatureSpont = require("./../models/candidatureSpont");
 const APIfeatures = require("./../utils/apiFeatures");
 const sendMail = require('./../utils/email');
@@ -80,16 +81,22 @@ exports.createCandidature = async (req, res) => {
 
 exports.getAllCandidatures = async (req, res) => {
   try {
-    const features = new APIfeatures(CandidatureSpont.find(), req.query)
+    const page = Number(req.query.page || 1), limit = Number(req.query.limit || 20);
+    if (!Number.isInteger(page) || page < 1 || !Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error('Pagination invalide.');
+    const filter = candidateFilters(req.query);
+    const queryParams = { ...req.query };
+    for (const key of ['experienceMin','educationMinimum','studyField','competence','langue','certification']) delete queryParams[key];
+    const features = new APIfeatures(CandidatureSpont.find(filter), queryParams)
       .filter()
       .sort()
       .limitFields()
       .paginate();
-    const candidatures = await features.query;
+    const [candidatures, total] = await Promise.all([features.query, CandidatureSpont.countDocuments(features.query.getFilter())]);
 
     res.status(200).json({
       status: "Success",
       numberofCandidatures: candidatures.length,
+      total, page, limit,
       candidatures,
     });
   } catch (err) {

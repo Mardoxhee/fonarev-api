@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const { retirementProjection } = require("../utils/retirement");
 
 const agentSchema = new mongoose.Schema({
 
@@ -19,6 +20,8 @@ const agentSchema = new mongoose.Schema({
     mutation: Boolean,
     dateFinContrat: Date,
     datePrevisionnelleRetraite: { type: Date, default: null },
+    age: { type: Number, min: 0, max: 120, validate: value => value == null || Number.isInteger(value) },
+    ageReferenceDate: Date,
     salaireNetAcquis: { type: Number, min: 0, select: false },
     finsContrat: [{
       modalite: { type: String, enum: ['Retraité', 'Licencié', 'Décédé', 'Démissionnaire'], required: true },
@@ -131,6 +134,20 @@ const agentSchema = new mongoose.Schema({
       account: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
       personnesAcharges : [{ type: mongoose.Schema.Types.ObjectId, ref: "PersonneAcharge" }],
 })
+
+// Calcul à la lecture : les anciens dossiers bénéficient aussi de la règle des 65 ans.
+agentSchema.set('toJSON', { transform(doc, result) {
+  const projection = retirementProjection(result);
+  result.datePrevisionnelleRetraite = projection.date;
+  result.anneePrevisionnelleRetraite = projection.year;
+  result.retraiteEstimeeDepuisAge = projection.estimated;
+  return result;
+} });
+agentSchema.pre('validate', function(next) {
+  if (this.isModified('age') && this.age != null && !this.ageReferenceDate) this.ageReferenceDate = new Date();
+  this.datePrevisionnelleRetraite = retirementProjection(this).date;
+  next();
+});
 
 const Agents = mongoose.model("Agents", agentSchema);
 module.exports = Agents;

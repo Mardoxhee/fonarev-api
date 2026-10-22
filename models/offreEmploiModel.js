@@ -43,6 +43,11 @@ const offreEmploiSchema = new mongoose.Schema(
     missions: [String],
     profilRecherche: [String],
     piecesRequises: [String],
+    minExperienceYears: { type: Number, min: 0, max: 60, default: null },
+    educationLevel: { type: String, enum: ['', 'aucun', 'secondaire', 'graduat', 'licence', 'master', 'doctorat'], default: '' },
+    requiredExperiences: String,
+    studyFields: [String], technicalSkills: [String], softSkills: [String],
+    languages: [String], certifications: [String], tools: [String], screeningQuestions: [String],
     nombrePostes: {
       type: Number,
       default: 1,

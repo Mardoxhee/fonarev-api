@@ -53,6 +53,7 @@ const documentSchema = new mongoose.Schema(
       default: "autre",
     },
     label: String,
+    requirementKey: String,
     url: {
       type: String,
       required: [true, "Le lien du document est requis"],
@@ -120,6 +121,9 @@ const candidatureSpontSchema = new mongoose.Schema({
   portfolio: String,
   disponibilite: String,
   pretentionSalariale: String,
+  experienceYears: { type: Number, min: 0, max: 60 },
+  educationLevel: { type: String, enum: ['', 'aucun', 'secondaire', 'graduat', 'licence', 'master', 'doctorat'] },
+  studyField: { type: String, trim: true },
   experiencesPro: [experienceSchema],
   parcoursAcademique: [parcoursAcademiqueSchema],
   certifications: [String],
