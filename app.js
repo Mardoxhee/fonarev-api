@@ -78,6 +78,8 @@ app.use(hrmPaths, cors(corsOptions), (req, res, next) => {
   return hrmProtect(req, res, () => hrmAuthorize(req, res, next));
 });
 
+app.use("/public/recruitment", require("./routes/publicRecruitmentRoutes"));
+
 app.use("/agents", cors(corsOptions), AgentRouter);
 app.use("/accounts", cors(corsOptions), AccountRouter);
 app.use("/directions", cors(corsOptions), DirectionRouter);
