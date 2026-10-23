@@ -11,6 +11,8 @@ const careerDocumentSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const optionalReference = value => typeof value === 'string' && !value.trim() ? null : value;
+
 const careerEventSchema = new mongoose.Schema(
   {
     agent: {
@@ -36,12 +38,12 @@ const careerEventSchema = new mongoose.Schema(
     newGrade: String,
     previousFunction: String,
     newFunction: String,
-    previousDirection: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
-    newDirection: { type: mongoose.Schema.Types.ObjectId, ref: "Direction" },
-    previousDivision: { type: mongoose.Schema.Types.ObjectId, ref: "Division" },
-    newDivision: { type: mongoose.Schema.Types.ObjectId, ref: "Division" },
-    previousService: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
-    newService: { type: mongoose.Schema.Types.ObjectId, ref: "Service" },
+    previousDirection: { type: mongoose.Schema.Types.ObjectId, ref: "Direction", set: optionalReference },
+    newDirection: { type: mongoose.Schema.Types.ObjectId, ref: "Direction", set: optionalReference },
+    previousDivision: { type: mongoose.Schema.Types.ObjectId, ref: "Division", set: optionalReference },
+    newDivision: { type: mongoose.Schema.Types.ObjectId, ref: "Division", set: optionalReference },
+    previousService: { type: mongoose.Schema.Types.ObjectId, ref: "Service", set: optionalReference },
+    newService: { type: mongoose.Schema.Types.ObjectId, ref: "Service", set: optionalReference },
     description: String,
     reference: String,
     documents: [careerDocumentSchema],

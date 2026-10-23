@@ -44,6 +44,8 @@ const auditLogSchema = new mongoose.Schema(
       index: true,
     },
     agent: { id: String, name: String, matricule: String },
+    target: { id: String, name: String, reference: String },
+    submittedFields: [String],
     queryKeys: [String],
     paramKeys: [String],
     message: String,

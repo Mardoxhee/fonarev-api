@@ -39,6 +39,14 @@ const normalizeBody = async (body, agentId, accountId) => {
     notificationDate: parseDate(body.notificationDate),
     documents: normalizeDocuments(body.documents),
   };
+  // Empty optional assignments represent no attachment, including on update.
+  for (const field of ['previousDirection', 'newDirection', 'previousDivision', 'newDivision', 'previousService', 'newService']) {
+    if (!Object.prototype.hasOwnProperty.call(payload, field)) continue;
+    const value = payload[field];
+    if (value == null || (typeof value === 'string' && !value.trim())) payload[field] = null;
+    else if (typeof value !== 'string' || !/^[a-f\d]{24}$/i.test(value.trim())) throw new Error('La direction, la division ou le service sélectionné est invalide.');
+    else payload[field] = value.trim();
+  }
   if (body.agent || agentId) payload.agent = body.agent || agentId;
   if (accountId) payload.account = accountId;
 

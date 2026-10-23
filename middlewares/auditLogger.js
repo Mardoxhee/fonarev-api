@@ -1,4 +1,4 @@
-const { hydrateAgents, agentIdForLog } = require('../utils/auditAgent');
+const { hydrateTargets, snapshot, targetId } = require('../utils/auditTarget');
 const AuditLog = require("../models/auditLogModel");
 const Account = require("../models/accountModel");
 
@@ -79,10 +79,25 @@ const shouldSkip = (req) => {
   return false;
 };
 
-const auditLogger = (req, res, next) => {
+const auditLogger = async (req, res, next) => {
   if (shouldSkip(req)) return next();
 
   const startedAt = Date.now();
+  const module = getModuleFromPath(req.originalUrl);
+  let savedTarget;
+  // Retain only a small identity snapshot, never the response or submitted values.
+  const originalJson = res.json;
+  res.json = function(body) {
+    if (res.statusCode < 400 && body && typeof body === 'object') {
+      const candidates = [body, ...Object.values(body)].filter(value => value && typeof value === 'object' && !Array.isArray(value));
+      savedTarget = candidates.map(value => snapshot(module, value)).find(Boolean) || savedTarget;
+    }
+    return originalJson.call(this, body);
+  };
+  if (req.method === 'DELETE') {
+    try { savedTarget = (await hydrateTargets([{ module, path: getSanitizedPath(req.originalUrl) }]))[0].target; } catch { /* Logging must not block the request. */ }
+  }
+
   res.on("finish", () => {
     setImmediate(async () => {
       try {
@@ -92,9 +107,10 @@ const auditLogger = (req, res, next) => {
         const resourceId = res.locals.auditResourceId || req.params?.id || req.params?.agentId || req.params?.eventId || req.params?.idOrSlug;
 
         const target = { module: moduleName, path: getSanitizedPath(req.originalUrl), resourceId };
-        const [enriched] = await hydrateAgents([target]);
+        const [enriched] = await hydrateTargets([{ ...target, target: savedTarget }]).catch(() => [{ target: savedTarget }]);
         await AuditLog.create({
-          agent: enriched.agent,
+          target: enriched.target,
+          submittedFields: ['PATCH', 'PUT', 'POST'].includes(req.method) ? Object.keys(req.body || {}).filter(key => /^(noms|prenom|sexe|matricule|grade|direction|division|service|fonction|statut|status|denomination|description|libele|titre|reference|contractType|minExperienceYears|educationLevel|dateNaissance|dateEngagement|telephone|email|adresse|permissions|name|code|dateFin|motif)$/.test(key)) : [],
           action,
           module: moduleName,
           method: req.method,
@@ -104,7 +120,7 @@ const auditLogger = (req, res, next) => {
           success: res.statusCode < 400,
           durationMs: Date.now() - startedAt,
           actor,
-          resourceId: resourceId ? String(resourceId) : agentIdForLog(target),
+          resourceId: resourceId ? String(resourceId) : targetId(target),
           queryKeys: Object.keys(req.query || {}),
           paramKeys: Object.keys(req.params || {}),
           message: res.locals.auditMessage,

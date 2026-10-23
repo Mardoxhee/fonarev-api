@@ -1,4 +1,4 @@
-const { hydrateAgents } = require('../utils/auditAgent');
+const { hydrateTargets } = require('../utils/auditTarget');
 const AuditLog = require("../models/auditLogModel");
 const Account = require("../models/accountModel");
 
@@ -121,7 +121,7 @@ exports.getAuditLogs = async (req, res) => {
       totalLogs,
       page,
       limit,
-      logs: await hydrateAgents(await hydrateActors(logs)),
+      logs: await hydrateTargets(await hydrateActors(logs)),
     });
   } catch (error) {
     res.status(400).json({
@@ -145,7 +145,7 @@ exports.getAuditLog = async (req, res) => {
 
     res.status(200).json({
       status: "Success",
-      log: (await hydrateAgents(await hydrateActors([log])))[0],
+      log: (await hydrateTargets(await hydrateActors([log])))[0],
     });
   } catch (error) {
     res.status(400).json({
