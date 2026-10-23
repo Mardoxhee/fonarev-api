@@ -39,6 +39,9 @@ const normalizeBody = async (body, agentId, accountId) => {
     notificationDate: parseDate(body.notificationDate),
     documents: normalizeDocuments(body.documents),
   };
+  if (payload.type === 'entree_service') {
+    for (const field of ['previousGrade', 'previousFunction', 'previousDirection', 'previousDivision', 'previousService']) payload[field] = null;
+  }
   // Empty optional assignments represent no attachment, including on update.
   for (const field of ['previousDirection', 'newDirection', 'previousDivision', 'newDivision', 'previousService', 'newService']) {
     if (!Object.prototype.hasOwnProperty.call(payload, field)) continue;
@@ -74,13 +77,7 @@ const buildEntryEvent = (agent) => {
     type: "entree_service",
     title: "Entrée en service",
     effectiveDate: agent.dateEntree,
-    notificationDate: agent.dateNotif,
-    newGrade: agent.grade,
-    newFunction: agent.fonction,
-    newDirection: agent.direction,
-    newDivision: agent.division,
-    newService: agent.serviceRef,
-    description: "Événement généré depuis la fiche agent.",
+    description: "Date d’entrée issue de la fiche agent. Le grade, la fonction et l’affectation à cette date restent à renseigner.",
     documents: [],
     generated: true,
   };
@@ -139,7 +136,9 @@ exports.createAgentCareerEvent = async (req, res) => {
 
 exports.updateCareerEvent = async (req, res) => {
   try {
-    const payload = await normalizeBody(req.body, undefined, req.decoded && req.decoded.id);
+    const existing = await CareerEvent.findById(req.params.eventId);
+    if (!existing) return res.status(404).json({ status: 'failed', message: 'Événement introuvable.' });
+    const payload = await normalizeBody({ ...req.body, type: req.body.type || existing.type }, undefined, req.decoded && req.decoded.id);
     const careerEvent = await populateCareerEvent(CareerEvent.findByIdAndUpdate(req.params.eventId, payload, {
       new: true,
       runValidators: true,
