@@ -37,6 +37,8 @@ router.patch('/:id/archive', protect, importRoles, archiveAgent);
 router.get('/:id/hrms-finance', protect, importRoles, hrmsImport.getFinance);
 router.patch('/:id/hrms-finance', protect, importRoles, hrmsImport.updateFinance);
 
+router.get('/matricule-preview', protect, require('../controllers/agentController').previewMatricule);
+
 // Route pour récupérer tous les agents et créer un nouvel agent
 router.route("/").get(protect, getAgents).post(protect, createAgent);
 

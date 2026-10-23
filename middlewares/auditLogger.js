@@ -1,3 +1,4 @@
+const { hydrateAgents, agentIdForLog } = require('../utils/auditAgent');
 const AuditLog = require("../models/auditLogModel");
 const Account = require("../models/accountModel");
 
@@ -90,7 +91,10 @@ const auditLogger = (req, res, next) => {
         const actor = await buildActor(req, res);
         const resourceId = res.locals.auditResourceId || req.params?.id || req.params?.agentId || req.params?.eventId || req.params?.idOrSlug;
 
+        const target = { module: moduleName, path: getSanitizedPath(req.originalUrl), resourceId };
+        const [enriched] = await hydrateAgents([target]);
         await AuditLog.create({
+          agent: enriched.agent,
           action,
           module: moduleName,
           method: req.method,
@@ -100,7 +104,7 @@ const auditLogger = (req, res, next) => {
           success: res.statusCode < 400,
           durationMs: Date.now() - startedAt,
           actor,
-          resourceId: resourceId ? String(resourceId) : undefined,
+          resourceId: resourceId ? String(resourceId) : agentIdForLog(target),
           queryKeys: Object.keys(req.query || {}),
           paramKeys: Object.keys(req.params || {}),
           message: res.locals.auditMessage,

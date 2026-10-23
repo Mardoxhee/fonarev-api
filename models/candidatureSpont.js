@@ -75,6 +75,9 @@ const formulaireAnswerSchema = new mongoose.Schema(
 );
 
 const candidatureSpontSchema = new mongoose.Schema({
+  reference: String,
+  submissionKey: { type: String, unique: true, sparse: true },
+  motivation: String,
   typeCandidature: {
     type: String,
     enum: ["spontanee", "offre_emploi", "stage", "consultance"],

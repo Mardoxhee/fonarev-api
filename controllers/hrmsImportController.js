@@ -86,6 +86,12 @@ exports.commit = async (req, res) => {
           hrmsArchived: false, hrmsArchivedAt: null,
           hrmsImport: { batch: job._id, row: row.row, importedAt: timestamp },
         };
+        // Invalid spreadsheet formulas must never erase an existing value.
+        if (existing) {
+          for (const field of row.unusableFields || []) {
+            if (Object.prototype.hasOwnProperty.call(update, field)) delete update[field];
+          }
+        }
         if (existing && id(existing.direction) !== direction?.id) { update.division = null; update.serviceRef = null; update.service = ''; }
         // Photos, documents, statuses, career history and dependent records are never overwritten.
         const validated = new Agent({ ...(existing || {}), ...update, statut: existing?.statut || 'Actif' });

@@ -1,3 +1,4 @@
+const { hydrateAgents } = require('../utils/auditAgent');
 const AuditLog = require("../models/auditLogModel");
 const Account = require("../models/accountModel");
 
@@ -61,6 +62,8 @@ const buildQuery = (params) => {
       { "actor.email": regex },
       { "actor.role": regex },
       { resourceId: regex },
+      { "agent.name": regex },
+      { "agent.matricule": regex },
     ];
   }
 
@@ -118,7 +121,7 @@ exports.getAuditLogs = async (req, res) => {
       totalLogs,
       page,
       limit,
-      logs: await hydrateActors(logs),
+      logs: await hydrateAgents(await hydrateActors(logs)),
     });
   } catch (error) {
     res.status(400).json({
@@ -142,7 +145,7 @@ exports.getAuditLog = async (req, res) => {
 
     res.status(200).json({
       status: "Success",
-      log: (await hydrateActors([log]))[0],
+      log: (await hydrateAgents(await hydrateActors([log])))[0],
     });
   } catch (error) {
     res.status(400).json({

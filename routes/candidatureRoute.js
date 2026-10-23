@@ -11,6 +11,7 @@ const {
 
   } = require("../controllers/candidatureSpontController");
 
+  router.get("/:id/documents/:documentId", protect, require("../controllers/publicApplicationController").download);
   router.route("/").get(protect, getAllCandidatures).post(createCandidature);
   router.get("/admin/all", protect, getAllCandidatures);
   router

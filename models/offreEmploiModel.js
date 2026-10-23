@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const offreEmploiSchema = new mongoose.Schema(
   {
+    applicationSequence: { type: Number, default: 0, select: false },
     titre: {
       type: String,
       required: [true, "Rentrez le titre de l'offre"],

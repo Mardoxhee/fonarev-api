@@ -83,7 +83,7 @@ function parseWorkbook(buffer, options = {}) {
     for (const field of Object.keys(columns)) {
       const cell = raw(field);
       if (cell?.t === 'e' || /^#(VALUE!|REF!|N\/A|DIV\/0!|NAME\?|NUM!|NULL!)/.test(text(cell?.v)) || (cell?.f && cell.v === undefined)) {
-        issue(rowNumber, field, 'Erreur de formule Excel : valeur laissée vide.'); values[field] = ''; continue;
+        issue(rowNumber, field, 'Erreur de formule Excel : valeur existante conservée si disponible.'); values[field] = ''; unusableFields.push(field); continue;
       }
       values[field] = cell?.v;
       if (['numeroCompte', 'numeroCNSS', 'matricule'].includes(field) && cell?.t === 'n') {

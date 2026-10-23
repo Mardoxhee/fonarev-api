@@ -33,4 +33,6 @@ router.get('/offres/:id', async (req, res) => {
     res.json({ offre });
   } catch (error) { res.status(503).json({ message: 'Cette offre est temporairement indisponible.' }); }
 });
+const applications = require('../controllers/publicApplicationController');
+router.post('/candidatures', applications.receive, applications.create);
 module.exports = router;

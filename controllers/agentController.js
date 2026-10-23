@@ -211,7 +211,15 @@ const normalizeAgentPayload = async (payload) => {
 exports.createAgent = async (req, res) => {
   try {
     if (['Retraité', 'Licencié', 'Décédé', 'Démissionnaire'].includes(req.body.statut)) return res.status(400).json({ message: "Créez le dossier puis enregistrez sa fin de contrat avec une date." });
-    const newAgent = await Agent.create(await normalizeAgentPayload(req.body));
+    const payload = await normalizeAgentPayload(req.body);
+    const numbering = require('../utils/agentMatricule');
+    // Validate the full dossier before reserving a sequence number.
+    const draft = new Agent({...payload, matricule: undefined});
+    await draft.validate();
+    const matricule = await numbering.allocate(payload.grade, payload.sexe);
+    if (matricule) payload.matricule = matricule;
+    else delete payload.matricule;
+    const newAgent = await Agent.create(payload);
     res.status(201).json({
       status: "Agent enregistré avec succès !",
       newAgent,
@@ -424,4 +432,12 @@ exports.archiveAgent = async (req, res) => {
     res.locals.auditResourceId = agent._id;
     res.json({ status: 'success', message: 'Agent archivé.' });
   } catch { res.status(400).json({ message: 'Impossible de retirer cet agent.' }); }
+};
+
+
+exports.previewMatricule = async (req, res) => {
+  try {
+    const matricule = await require('../utils/agentMatricule').preview(req.query.grade, req.query.sexe);
+    res.set('Cache-Control','no-store').json({matricule});
+  } catch(error) { res.status(400).json({message:error.message}); }
 };
