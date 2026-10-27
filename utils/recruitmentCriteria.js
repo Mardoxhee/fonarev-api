@@ -1,4 +1,4 @@
-const educationLevels = ['', 'aucun', 'secondaire', 'graduat', 'licence', 'master', 'doctorat'];
+const educationLevels = ['', 'aucun', 'secondaire', 'diplome_etat', 'graduat', 'licence', 'master', 'doctorat'];
 const criteriaLists = ['studyFields','technicalSkills','softSkills','languages','certifications','tools','screeningQuestions'];
 function normalizeCriteria(key, value) {
   if (key === 'minExperienceYears') {

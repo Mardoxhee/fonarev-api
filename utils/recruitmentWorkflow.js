@@ -31,6 +31,8 @@ function content(body) {
       result[key] = value.trim();
     }
   }
+  if (result.typeOffre === 'stage') result.contractType = 'Stage';
+  if (result.typeOffre === 'consultance') result.contractType = 'Consultance';
   return result;
 }
 function missing(offer, now = Date.now()) {
