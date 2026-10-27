@@ -26,19 +26,25 @@ function gradeCode(label){
 }
 function prefix(grade,sexe){if(!['M','F'].includes(sexe))throw new Error('Sélectionnez le sexe M ou F.');return gradeCode(grade)+sexe;}
 function sequence(matricule){const match=/^\d{3}[MF](\d+)$/.exec(matricule||'');return match?Number(match[1]):0;}
-async function latestSequence(){
- const latest=await Agent.findOne({matricule:/^\d{3}[MF]\d+$/}).sort({_id:-1}).select('matricule').lean();
- const value=sequence(latest?.matricule);if(!Number.isSafeInteger(value))throw new Error('Dernier numéro de matricule invalide.');
- return value;
+async function highestSequence(){
+ // Include inactive and archived records: an assigned arrival number is never reused.
+ const agents=await Agent.find({matricule:/^\d{3}[MF]\d+$/}).select('matricule').lean();
+ let highest=0;
+ for(const agent of agents){
+  const value=sequence(agent.matricule);
+  if(!Number.isSafeInteger(value))throw new Error('Numéro de matricule existant invalide.');
+  highest=Math.max(highest,value);
+ }
+ return highest;
 }
 async function preview(grade,sexe){
  if(exemption(grade))return null;
- const start=prefix(grade,sexe);const [last,counter]=await Promise.all([latestSequence(),Counter.findById('agents').lean()]);
+ const start=prefix(grade,sexe);const [last,counter]=await Promise.all([highestSequence(),Counter.findById('agents').lean()]);
  return start+String(Math.max(last,counter?.value||0)+1).padStart(3,'0');
 }
 async function allocate(grade,sexe){
  if(exemption(grade))return null;
- const start=prefix(grade,sexe),last=await latestSequence();
+ const start=prefix(grade,sexe),last=await highestSequence();
  let counter;
  for(let attempt=0;attempt<3;attempt++){
   try{counter=await Counter.findOneAndUpdate({_id:'agents'},[{$set:{value:{$add:[{$max:[{$ifNull:['$value',0]},last]},1]}}}],{upsert:true,new:true});break;}

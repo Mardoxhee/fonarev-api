@@ -34,7 +34,7 @@ const agentSchema = new mongoose.Schema({
       enregistrePar: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
     }],
     hrmsFinance: {
-      type: new mongoose.Schema({ numeroCNSS: String, numeroCompte: String, banque: String }, { _id: false }),
+      type: new mongoose.Schema({ numeroCNSS: String, nif: String, numeroCompte: String, banque: String }, { _id: false }),
       select: false,
     },
     hrmsArchived: { type: Boolean, default: false, index: true },

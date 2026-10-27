@@ -82,7 +82,7 @@ exports.commit = async (req, res) => {
           province: row.province || null,
           emailPro: /@fonarev\.cd$/i.test(emailPro) ? emailPro : '',
           emailPerso: emailPro && !/@fonarev\.cd$/i.test(emailPro) ? emailPro : existing?.emailPerso || '',
-          hrmsFinance: { numeroCNSS: row.unusableFields?.includes('numeroCNSS') ? existing?.hrmsFinance?.numeroCNSS || '' : numeroCNSS, numeroCompte: row.unusableFields?.includes('numeroCompte') ? existing?.hrmsFinance?.numeroCompte || '' : numeroCompte, banque },
+          hrmsFinance: { nif: existing?.hrmsFinance?.nif || '', numeroCNSS: row.unusableFields?.includes('numeroCNSS') ? existing?.hrmsFinance?.numeroCNSS || '' : numeroCNSS, numeroCompte: row.unusableFields?.includes('numeroCompte') ? existing?.hrmsFinance?.numeroCompte || '' : numeroCompte, banque },
           hrmsArchived: false, hrmsArchivedAt: null,
           hrmsImport: { batch: job._id, row: row.row, importedAt: timestamp },
         };
@@ -126,7 +126,7 @@ exports.getFinance = async (req, res) => {
 exports.updateFinance = async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Identifiant agent invalide.' });
-    const fields = ['banque', 'numeroCompte', 'numeroCNSS'];
+    const fields = ['banque', 'numeroCompte', 'numeroCNSS', 'nif'];
     const updates = {};
     for (const field of fields) {
       if (!Object.prototype.hasOwnProperty.call(req.body || {}, field)) continue;
