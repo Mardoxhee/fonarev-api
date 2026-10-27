@@ -1,7 +1,7 @@
 const { criteriaLists, normalizeCriteria } = require('./recruitmentCriteria');
 const transitions = {
-  brouillon: ['en_validation', 'archive'],
-  en_validation: ['valide', 'brouillon', 'archive'],
+  brouillon: ['publie', 'archive'],
+  en_validation: ['publie', 'brouillon', 'archive'],
   valide: ['publie', 'brouillon', 'archive'],
   publie: ['suspendu', 'ferme'],
   suspendu: ['publie', 'brouillon', 'ferme'],

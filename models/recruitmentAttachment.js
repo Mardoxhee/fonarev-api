@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
-// Files stay private in MongoDB; never served by a public static directory.
+// New files use MinIO; buffers are retained only for legacy attachments.
 const schema = new mongoose.Schema({
   candidature: {type: mongoose.Schema.Types.ObjectId, required:true, index:true},
   label: String,
   requirementKey: String,
-  data: {type:Buffer, required:true, select:false}
+  storageKey: {type:String, select:false},
+  originalName: String,
+  size: Number,
+  data: {type:Buffer, select:false}
 },{timestamps:true});
 module.exports = mongoose.model('RecruitmentAttachment',schema);

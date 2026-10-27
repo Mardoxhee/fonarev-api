@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
+const storage = require('../utils/recruitmentStorage');
 const multer = require('multer');
 const validator = require('validator');
 const Candidate = require('../models/candidatureSpont');
@@ -40,6 +41,7 @@ exports.receive=(req,res,next)=>{
 };
 exports.create=async(req,res)=>{
   let session;
+  const stored = new Map();
   try {
     if(!/^[a-f0-9]{24}$/i.test(req.body.offreId||''))throw fail('Offre introuvable.',410);
     // Ensure the unique index is ready before accepting concurrent submissions.
@@ -61,7 +63,9 @@ exports.create=async(req,res)=>{
       const documents=[];
       for(const file of files){
         const attachmentId=new mongoose.Types.ObjectId();
-        await Attachment.create([{_id:attachmentId,candidature:candidateId,data:file.buffer,label:file.label,requirementKey:file.requirementKey}],{session});
+        // Reuse uploaded objects if MongoDB retries the transaction.
+        if (!stored.has(file.requirementKey)) stored.set(file.requirementKey, await storage.upload(file, crypto.randomUUID()));
+        await Attachment.create([{_id:attachmentId,candidature:candidateId,storageKey:stored.get(file.requirementKey),originalName:file.originalname,size:file.size,label:file.label,requirementKey:file.requirementKey}],{session});
         documents.push({type:'autre',label:file.label,requirementKey:file.requirementKey,url:'/candidatures/'+candidateId+'/documents/'+attachmentId});
       }
       const submissionKey=crypto.createHash('sha256').update(String(offer._id)+'|'+payload.email).digest('hex');
@@ -76,9 +80,11 @@ exports.create=async(req,res)=>{
 exports.download=async(req,res)=>{
   try {
     if(![req.params.id,req.params.documentId].every(v=>/^[a-f0-9]{24}$/i.test(v)))return res.sendStatus(404);
-    const file=await Attachment.findOne({_id:req.params.documentId,candidature:req.params.id}).select('+data');
+    const file=await Attachment.findOne({_id:req.params.documentId,candidature:req.params.id}).select('+data +storageKey');
     if(!file)return res.sendStatus(404);
-    res.set({'Content-Type':'application/pdf','Content-Disposition':'attachment; filename="document.pdf"','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'});
-    res.send(file.data);
+    const data = file.storageKey ? await storage.read(file.storageKey) : file.data;
+    if (!data) return res.sendStatus(404);
+    res.set({'Content-Type':'application/pdf','Content-Disposition':(req.query.inline === '1' ? 'inline' : 'attachment') + '; filename="document.pdf"','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'});
+    res.send(data);
   }catch{res.sendStatus(503);}
 };
