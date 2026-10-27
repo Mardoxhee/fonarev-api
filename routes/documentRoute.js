@@ -26,7 +26,7 @@ const {
   .route("/:id")
   .get(getOneDocument)
   .patch(updateDocument)
-  .delete(deleteDocument);
+  .delete(protect, deleteDocument);
 
 
 module.exports = router;
