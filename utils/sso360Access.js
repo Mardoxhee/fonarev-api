@@ -5,10 +5,6 @@ function parseAccess(payload, userId, applicationId = '19') {
   const { user, application, authorisation } = payload || {};
   if (!user) throw new Error('Réponse Core sans objet utilisateur.');
   if (String(user.id) !== String(userId)) throw new Error('Identité incohérente : user.id ne correspond pas à l’identifiant signé dans le jeton.');
-  if (user.status !== true) throw new Error('Compte 360 inactif : user.status doit être true.');
-  if (user.isActivate === false) throw new Error('Compte 360 désactivé : user.isActivate vaut false.');
-  if (user.isblocked !== false) throw new Error('Compte 360 bloqué ou état isblocked absent : la valeur attendue est false.');
-  if (user.deletedAt) throw new Error('Compte 360 supprimé : deletedAt est renseigné.');
   if (!application) throw new Error('Réponse Core sans objet application.');
   if (String(application.id) !== String(applicationId)) throw new Error('Application HRMS incohérente avec FONAREV360_APPLICATION_ID.');
   if (application.status !== true) throw new Error('Application HRMS inactive : application.status doit être true.');

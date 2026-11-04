@@ -69,10 +69,6 @@ exports.exchange = async (req, res) => {
   record('permissions', 'CORE_PAYLOAD_CHECK', {
     hasUser: Boolean(coreUser),
     userIdMatchesToken: Boolean(coreUser && String(coreUser.id) === String(claims.user.id)),
-    userStatus: coreUser?.status ?? null,
-    userIsActivate: coreUser?.isActivate ?? null,
-    userIsBlocked: coreUser?.isblocked ?? null,
-    userDeleted: Boolean(coreUser?.deletedAt),
     hasApplication: Boolean(coreApplication),
     applicationIdMatches: Boolean(coreApplication && String(coreApplication.id) === String(expectedApplicationId)),
     applicationStatus: coreApplication?.status ?? null,
