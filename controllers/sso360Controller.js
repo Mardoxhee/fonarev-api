@@ -16,7 +16,7 @@ exports.exchange = async (req, res) => {
     return res.status(status).json({ message, diagnostic: { requestId, serverTime: new Date().toISOString(), steps } });
   };
   const secret = process.env.FONAREV360_JWT_SECRET;
-  const base = process.env.FONAREV360_API_BASE_URL;
+  const base = process.env.CORE_SSO_BASE_URL || process.env.FONAREV360_API_BASE_URL;
   if (!secret || secret === '...' || !base || !process.env.JWT_SECRET) return fail(503, 'configuration', 'SSO_NOT_CONFIGURED', 'La connexion 360 n’est pas configurée sur le backend HRMS.');
   const token = typeof req.body?.token === 'string' ? req.body.token.trim().replace(/^Bearer\s+/i, '') : null;
   if (typeof token !== 'string' || token.length > 32768) return fail(400, 'token', 'TOKEN_MISSING', 'Token 360 absent ou invalide.');
