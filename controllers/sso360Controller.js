@@ -66,6 +66,24 @@ exports.exchange = async (req, res) => {
   const expectedApplicationId = process.env.FONAREV360_APPLICATION_ID || '19';
   const coreUser = snapshot?.user;
   const coreApplication = snapshot?.application;
+  const authorisationChecks = Array.isArray(snapshot?.authorisation) ? snapshot.authorisation.map((entry, index) => {
+    const roleName = String(entry?.role?.role || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+    const role = ({ admin: 'superadmin', administrateur: 'superadmin', rh: 'rh_owner', drh: 'rh_owner', dg: 'rh_reader', manager: 'invite', utilisateur: 'invite' })[roleName] || roleName;
+    const moduleName = String(entry?.module?.module || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toUpperCase();
+    const mappedModule = ({ REPORTING: 'reporting', REPPORTING: 'reporting', AGENTS: 'agents', FORMATION: 'formation', RECRUTEMENT: 'recrutement', UTILISATEURS: 'utilisateurs', REGLAGES: 'reglages' })[moduleName] || null;
+    const privileges = Array.isArray(entry?.role?.privileges) ? entry.role.privileges.map(item => String(item?.privilege || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toUpperCase()) : [];
+    return {
+      index,
+      module: moduleName || null,
+      mappedModule,
+      role: role || null,
+      roleRecognized: ['rh_owner', 'rh_reader', 'superadmin', 'invite'].includes(role),
+      roleApplicationMatches: Boolean(coreApplication && String(entry?.role?.applicationId) === String(coreApplication.id)),
+      moduleDeleted: Boolean(entry?.module?.deletedAt),
+      privileges,
+      hasReadPrivilege: privileges.some(value => ['LIRE', 'AFFICHER', 'CONSULTER'].includes(value)),
+    };
+  }) : [];
   record('permissions', 'CORE_PAYLOAD_CHECK', {
     hasUser: Boolean(coreUser),
     userIdMatchesToken: Boolean(coreUser && String(coreUser.id) === String(claims.user.id)),
@@ -74,6 +92,7 @@ exports.exchange = async (req, res) => {
     applicationStatus: coreApplication?.status ?? null,
     authorisationIsArray: Array.isArray(snapshot?.authorisation),
     authorisationCount: Array.isArray(snapshot?.authorisation) ? snapshot.authorisation.length : null,
+    authorisationChecks,
   });
   try { access = parseAccess(snapshot, claims.user.id, expectedApplicationId); }
   catch (error) {
