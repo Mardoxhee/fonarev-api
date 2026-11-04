@@ -63,8 +63,27 @@ exports.exchange = async (req, res) => {
     snapshot = responsePayload;
   } catch { return fail(502, 'permissions', 'CORE_REQUEST_FAILED', 'Impossible de vérifier les habilitations auprès de 360. Vérifiez l’URL serveur, le réseau et le certificat TLS.'); }
   let access;
-  try { access = parseAccess(snapshot, claims.user.id, process.env.FONAREV360_APPLICATION_ID || '19'); }
-  catch (error) { return fail(403, 'permissions', 'CORE_IDENTITY_OR_ACCESS_REJECTED', error.message); }
+  const expectedApplicationId = process.env.FONAREV360_APPLICATION_ID || '19';
+  const coreUser = snapshot?.user;
+  const coreApplication = snapshot?.application;
+  record('permissions', 'CORE_PAYLOAD_CHECK', {
+    hasUser: Boolean(coreUser),
+    userIdMatchesToken: Boolean(coreUser && String(coreUser.id) === String(claims.user.id)),
+    userStatus: coreUser?.status ?? null,
+    userIsActivate: coreUser?.isActivate ?? null,
+    userIsBlocked: coreUser?.isblocked ?? null,
+    userDeleted: Boolean(coreUser?.deletedAt),
+    hasApplication: Boolean(coreApplication),
+    applicationIdMatches: Boolean(coreApplication && String(coreApplication.id) === String(expectedApplicationId)),
+    applicationStatus: coreApplication?.status ?? null,
+    authorisationIsArray: Array.isArray(snapshot?.authorisation),
+    authorisationCount: Array.isArray(snapshot?.authorisation) ? snapshot.authorisation.length : null,
+  });
+  try { access = parseAccess(snapshot, claims.user.id, expectedApplicationId); }
+  catch (error) {
+    record('permissions', 'CORE_PAYLOAD_REJECTED', { reason: error.message });
+    return fail(403, 'permissions', 'CORE_IDENTITY_OR_ACCESS_REJECTED', error.message);
+  }
   try {
     const { user, ...rights } = access;
     const filter = { provider: 'fonarev360', externalId: String(user.id) };
