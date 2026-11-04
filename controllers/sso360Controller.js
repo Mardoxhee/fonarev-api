@@ -41,7 +41,7 @@ exports.exchange = async (req, res) => {
   try {
     const root = new URL(base);
     if (root.protocol !== 'https:' || root.username || root.password) throw new Error('Configuration URL');
-    const code = 'HRMS';
+    const code = process.env.FONAREV360_APPLICATION_CODE || 'FHRMS';
     const url = `${root.toString().replace(/\/$/, '')}/user/app/${encodeURIComponent(code)}/${encodeURIComponent(claims.user.id)}`;
     record('permissions', 'CORE_REQUEST_STARTED', { endpoint: '/user/app/{application}/{userId}', applicationCode: code });
     const response = await fetch(url, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(15000) });
