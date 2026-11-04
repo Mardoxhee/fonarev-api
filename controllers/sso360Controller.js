@@ -45,10 +45,22 @@ exports.exchange = async (req, res) => {
     const url = `${root.toString().replace(/\/$/, '')}/user/app/${encodeURIComponent(code)}/${encodeURIComponent(claims.user.id)}`;
     record('permissions', 'CORE_REQUEST_STARTED', { endpoint: '/user/app/{application}/{userId}', applicationCode: code });
     const response = await fetch(url, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(15000) });
-    record('permissions', 'CORE_RESPONSE', { httpStatus: response.status });
+    const responseText = await response.text();
+    let responsePayload;
+    try { responsePayload = JSON.parse(responseText); } catch { responsePayload = null; }
+    const upstream = responsePayload && typeof responsePayload === 'object' ? responsePayload : {};
+    const upstreamCode = upstream.code || upstream.errorCode || (typeof upstream.error === 'string' ? upstream.error : undefined);
+    const upstreamMessage = upstream.message || upstream.error_description || (typeof upstream.error === 'string' ? upstream.error : undefined);
+    record('permissions', 'CORE_RESPONSE', {
+      httpStatus: response.status,
+      coreHost: root.host,
+      ...(upstreamCode ? { coreErrorCode: String(upstreamCode).slice(0, 100) } : {}),
+      ...(upstreamMessage ? { coreErrorMessage: String(upstreamMessage).replaceAll(token, '[redacted]').slice(0, 240) } : !response.ok ? { coreErrorMessage: `Réponse sans message JSON (${response.headers.get('content-type') || 'content-type inconnu'}).` } : {}),
+    });
     if ([401, 403].includes(response.status)) return fail(response.status, 'permissions', 'CORE_ACCESS_DENIED', '360 a refusé la connexion ou l’accès à HRMS.');
     if (!response.ok) throw new Error('API indisponible');
-    snapshot = await response.json();
+    if (!responsePayload) throw new Error('Réponse JSON invalide');
+    snapshot = responsePayload;
   } catch { return fail(502, 'permissions', 'CORE_REQUEST_FAILED', 'Impossible de vérifier les habilitations auprès de 360. Vérifiez l’URL serveur, le réseau et le certificat TLS.'); }
   let access;
   try { access = parseAccess(snapshot, claims.user.id, process.env.FONAREV360_APPLICATION_ID || '19'); }
