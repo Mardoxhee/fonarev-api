@@ -78,7 +78,7 @@ exports.exchange = async (req, res) => {
       mappedModule,
       role: role || null,
       roleRecognized: ['rh_owner', 'rh_reader', 'superadmin', 'invite'].includes(role),
-      roleApplicationMatches: Boolean(coreApplication && String(entry?.role?.applicationId) === String(coreApplication.id)),
+      roleApplicationIdPresent: entry?.role?.applicationId != null,
       moduleDeleted: Boolean(entry?.module?.deletedAt),
       privileges,
       hasReadPrivilege: privileges.some(value => ['LIRE', 'AFFICHER', 'CONSULTER'].includes(value)),

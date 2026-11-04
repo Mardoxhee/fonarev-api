@@ -13,7 +13,10 @@ function parseAccess(payload, userId, applicationId = '19') {
   for (const entry of authorisation) {
     const role = normalizeRole(entry.role?.role);
     const module = moduleMap[normalize(entry.module?.module)];
-    if (!ROLES.includes(role) || !module || entry.module?.deletedAt || String(entry.role?.applicationId) !== String(application.id)) continue;
+    // Core's /user/app/{application}/{userId} response is already scoped to the
+    // requested application. role.applicationId is not the application's id in
+    // this response contract, so don't use it to discard otherwise valid grants.
+    if (!ROLES.includes(role) || !module || entry.module?.deletedAt) continue;
     const privileges = (entry.role.privileges || []).map(p => normalize(p.privilege));
     if (!privileges.some(p => ['LIRE', 'AFFICHER', 'CONSULTER'].includes(p))) continue;
     roles.add(role); modules.add(module);
